@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#02020c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Neon Snake">
+  <meta name="description" content="Neon Snake — A stylish arcade game by Neon Inc. v5.0 Release Edition.">
+  <title>Neon Snake — Neon Inc v5.0</title>
+  <meta name="copyright" content="© 2025 Neon Inc — All Rights Reserved">
+  <meta name="author" content="Neon Inc">	
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ═══ SPLASH ═══ -->
+  <div id="splash">
+    <div id="splashLogo">NEON INC</div>
+    <div id="splashSub">PRESENTS</div>
+    <div id="splashBarWrap"><div id="splashBarFill"></div></div>
+    <div id="splashVer">© 2025 Neon Inc</div>
+  </div>
+
+  <!-- ═══ GLOBAL OVERLAYS ═══ -->
+  <canvas id="bgCvs" aria-hidden="true"></canvas>
+  <div id="scanlines"   aria-hidden="true"></div>
+  <div id="vignette"   aria-hidden="true"></div>
+  <div id="glitchLayer" aria-hidden="true"></div>
+
+  <!-- ═══ FLOATING UI ═══ -->
+  <div id="achieveToast" role="status" aria-live="polite"></div>
+  <div id="milestoneHint" aria-live="polite"></div>
+  <div id="scorePopup"  aria-hidden="true"></div>
+  <div id="bossAlert"   aria-hidden="true"><div id="bossAlertTxt"></div></div>
+
+  <!-- BAD APPLE INFECTION TIMER -->
+  <div id="infectionBar" aria-label="Infection timer">
+    <div id="infectionLabel">☠ INFECTED</div>
+    <div id="infectionTrack"><div id="infectionFill"></div></div>
+  </div>
+
+  <!-- ═══ HUD ═══ -->
+  <div id="topBar">
+    <div class="hud-cell">
+      <span class="hud-lbl">SCORE</span>
+      <span id="hudScore"  class="hud-val">0</span>
+    </div>
+    <div class="hud-cell" id="wrapCombo">
+      <span class="hud-lbl">COMBO</span>
+      <span id="hudCombo" class="hud-val hud-combo">×1</span>
+    </div>
+    <div class="hud-cell" id="wrapMulti">
+      <span class="hud-lbl">MULTI</span>
+      <span id="hudMulti" class="hud-val hud-multi">2×</span>
+    </div>
+    <div class="hud-cell">
+      <span class="hud-lbl">LVL</span>
+      <span id="hudLevel" class="hud-val">1</span>
+    </div>
+    <div class="hud-cell">
+      <span class="hud-lbl">BEST</span>
+      <span id="hudBest"  class="hud-val">0</span>
+    </div>
+    <button id="pauseBtn" class="pause-btn" aria-label="Pause">⏸</button>
+  </div>
+
+  <!-- ═══ BOSS HP ═══ -->
+  <div id="bossHPWrap">
+    <span id="bossHPLbl">⚡ BOSS</span>
+    <div id="bossHPTrack"><div id="bossHPFill"></div></div>
+    <span id="bossHPNum">8</span>
+  </div>
+
+  <!-- ═══ GAME AREA ═══ -->
+  <div id="gameContainer">
+    <canvas id="gameCanvas" aria-label="Neon Snake game board"></canvas>
+
+    <!-- MOBILE D-PAD -->
+    <div id="dpad" aria-label="Directional controls">
+      <button class="dpad-btn" id="dUp"    aria-label="Up">▲</button>
+      <div class="dpad-mid">
+        <button class="dpad-btn" id="dLeft"  aria-label="Left">◀</button>
+        <div class="dpad-center"></div>
+        <button class="dpad-btn" id="dRight" aria-label="Right">▶</button>
+      </div>
+      <button class="dpad-btn" id="dDown"  aria-label="Down">▼</button>
+    </div>
+
+    <!-- ════ MAIN MENU ════ -->
+    <div id="mainMenu" class="panel">
+      <div class="menu-logo">
+        <div class="logo-n">NEON</div>
+        <div class="logo-s">SNAKE</div>
+        <div class="logo-tag">v5.0 · © 2025 Neon Inc — All Rights Reserved</div>
+      </div>
+      <div id="menuStreak" class="menu-streak"></div>
+      <div id="menuHS"     class="menu-hs"></div>
+      <nav class="menu-nav">
+        <button id="playBtn"      class="btn-primary">▶  PLAY</button>
+        <button id="customizeBtn" class="btn-ghost">CUSTOMIZE</button>
+        <button id="achieveBtn"   class="btn-ghost">ACHIEVEMENTS</button>
+        <button id="statsBtn"     class="btn-ghost">STATS</button>
+        <button id="settingsBtn"  class="btn-ghost">SETTINGS</button>
+      </nav>
+    </div>
+
+    <!-- ════ MODE SELECT ════ -->
+    <div id="modePanel" class="panel hidden">
+      <h2 class="panel-title">CHOOSE YOUR MODE</h2>
+      <div class="mode-cards">
+        <div class="mode-card" id="modeClassic">
+          <div class="mode-icon">⊞</div>
+          <div class="mode-name">CLASSIC</div>
+          <div class="mode-desc">Grid-based. WASD or arrows.<br>Wall wrap. Combo scaling.</div>
+          <div class="mode-tag">ORIGINAL</div>
+        </div>
+        <div class="mode-card" id="modeFreeAim">
+          <div class="mode-icon">◎</div>
+          <div class="mode-name">FREE AIM</div>
+          <div class="mode-desc">Mouse or touch steering.<br>Smooth curves. No grid lock.</div>
+          <div class="mode-tag new-tag">NEW</div>
+        </div>
+      </div>
+      <button id="backFromMode" class="btn-ghost">← BACK</button>
+    </div>
+
+    <!-- ════ CUSTOMIZE ════ -->
+    <div id="customizePanel" class="panel hidden">
+      <h2 class="panel-title">CUSTOMIZE</h2>
+      <div class="cust-tabs">
+        <button class="cust-tab active" data-section="skins">SKINS</button>
+        <button class="cust-tab" data-section="trails">TRAILS</button>
+        <button class="cust-tab" data-section="themes">THEMES</button>
+      </div>
+      <div id="custSkins"  class="cust-section skin-grid"></div>
+      <div id="custTrails" class="cust-section skin-grid hidden"></div>
+      <div id="custThemes" class="cust-section theme-grid hidden"></div>
+      <button id="backFromCustomize" class="btn-ghost">← BACK</button>
+    </div>
+
+    <!-- ════ ACHIEVEMENTS ════ -->
+    <div id="achievePanel" class="panel hidden">
+      <h2 class="panel-title">ACHIEVEMENTS</h2>
+      <div class="ach-tabs">
+        <button class="a-tab active" data-cat="all">All</button>
+        <button class="a-tab" data-cat="classic">Classic</button>
+        <button class="a-tab" data-cat="free">Free Aim</button>
+        <button class="a-tab" data-cat="boss">Boss</button>
+        <button class="a-tab" data-cat="meta">Lifetime</button>
+      </div>
+      <div id="achieveList" class="achieve-list"></div>
+      <div id="achieveCount" class="achieve-count"></div>
+      <button id="backFromAchieve" class="btn-ghost">← BACK</button>
+    </div>
+
+    <!-- ════ STATS ════ -->
+    <div id="statsPanel" class="panel hidden">
+      <h2 class="panel-title">LIFETIME STATS</h2>
+      <div id="statsGrid" class="stats-grid"></div>
+      <button id="backFromStats" class="btn-ghost">← BACK</button>
+    </div>
+
+    <!-- ════ SETTINGS ════ -->
+    <div id="settingsPanel" class="panel hidden">
+      <h2 class="panel-title">SETTINGS</h2>
+      <div class="settings-grid">
+        <div class="setting-row"><label>Sound FX</label><input type="checkbox" id="sfxToggle" class="toggle" checked></div>
+        <div class="setting-row"><label>Volume</label><input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.5"></div>
+        <div class="setting-row"><label>Camera Shake</label><input type="checkbox" id="shakeToggle" class="toggle" checked></div>
+        <div class="setting-row"><label>Particles</label><input type="checkbox" id="particleToggle" class="toggle" checked></div>
+        <div class="setting-row"><label>BG Animate</label><input type="checkbox" id="bgToggle" class="toggle" checked></div>
+        <div class="setting-row"><label>Controls</label>
+          <select id="controlSelect"><option value="both">Both</option><option value="arrows">Arrows</option><option value="wasd">WASD</option></select>
+        </div>
+        <div class="setting-row"><label>Light Mode</label><input type="checkbox" id="lightToggle" class="toggle"></div>
+      </div>
+      <button id="backFromSettings" class="btn-ghost">← BACK</button>
+    </div>
+
+    <!-- ════ BOSS DEFEATED ════ -->
+    <div id="bossPanel" class="panel hidden">
+      <div class="boss-skull">💀</div>
+      <h2 class="panel-title boss-red">BOSS DEFEATED</h2>
+      <div id="bossReward" class="boss-reward"></div>
+      <p class="boss-sub">What do you choose?</p>
+      <div class="end-buttons">
+        <button id="ascendBtn" class="btn-primary">⚡ ASCEND</button>
+        <button id="claimBtn"  class="btn-ghost">CLAIM &amp; END</button>
+      </div>
+    </div>
+
+    <!-- ════ END SCREEN ════ -->
+    <div id="endPanel" class="panel hidden">
+      <h2 class="panel-title" id="endTitle">RUN COMPLETE</h2>
+      <div id="rankBadge" class="rank-badge"></div>
+      <div id="endStats"  class="end-stats"></div>
+      <div class="xp-section">
+        <div id="xpLabel" class="xp-label"></div>
+        <div id="xpBarWrap"><div id="xpBarFill"></div></div>
+        <div id="xpMilestone" class="xp-milestone"></div>
+      </div>
+      <div id="unlockStats"  class="unlock-badge"></div>
+      <div id="endAchieves"  class="end-achieves"></div>
+      <div class="end-buttons">
+        <button id="playAgainBtn"  class="btn-primary">▶ PLAY AGAIN</button>
+        <button id="backToMenuBtn" class="btn-ghost">MENU</button>
+      </div>
+    </div>
+
+  </div><!-- /gameContainer -->
+
+  <div id="mobileHint">SWIPE OR DRAG FINGER TO STEER</div>
+  <script src="game.js"></script>
+</body>
+</html>
