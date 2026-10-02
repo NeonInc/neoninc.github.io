@@ -1,0 +1,10 @@
+{
+  "name": "Neon Arcade",
+  "short_name": "Neon Arcade",
+  "description": "Retro neon arcade games with one shared account, levels, quests and rewards.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#03030d",
+  "theme_color": "#03030d",
+  "icons": [{ "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
