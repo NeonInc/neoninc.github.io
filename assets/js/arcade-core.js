@@ -31,35 +31,35 @@ function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<'
 ───────────────────────────────────────────────────────── */
 const GAMES = [
   {
-    id: 'snake', name: 'NEON SNAKE', short: 'SNAKE', icon: '🐍', color: '#00ff66', path: 'games/snake/',
+    id: 'snake', name: 'NEON SNAKE', short: 'SNAKE', icon: '🐍', color: '#00ff66', path: 'games/snake/index.html',
     tagline: 'Dominate the grid. Chain combos, survive bad apples and take down the boss.',
     genre: 'ARCADE CLASSIC', added: '2025-01-01',
     xp: s => 15 + Math.round((s.score || 0) * 2.2) + (s.boss ? 120 : 0),
     shards: s => Math.floor((s.score || 0) / 3) + (s.boss ? 40 : 0),
   },
   {
-    id: 'flight', name: 'NEON FLIGHT', short: 'FLIGHT', icon: '🚀', color: '#00f0ff', path: 'games/flight/',
+    id: 'flight', name: 'NEON FLIGHT', short: 'FLIGHT', icon: '🚀', color: '#00f0ff', path: 'games/flight/index.html',
     tagline: 'Precision flight through digital chaos. Grab shards, cross realms, survive the glitch.',
     genre: 'REFLEX', added: '2025-01-01',
     xp: s => 15 + Math.round((s.score || 0) * 4.5),
     shards: s => (s.shards || 0) + Math.floor((s.score || 0) / 5),
   },
   {
-    id: 'stack', name: 'NEON STACK', short: 'STACK', icon: '🧩', color: '#c04bff', path: 'games/stack/',
+    id: 'stack', name: 'NEON STACK', short: 'STACK', icon: '🧩', color: '#c04bff', path: 'games/stack/index.html',
     tagline: 'Falling-block puzzler. Hold, spin, clear quads and chase the perfect stack.',
     genre: 'PUZZLE', added: '2026-10-01',
     xp: s => 15 + (s.lines || 0) * 3 + Math.floor((s.score || 0) / 600) + (s.sprintDone ? 60 : 0),
     shards: s => (s.lines || 0) + (s.quads || 0) * 4 + (s.tspins || 0) * 3,
   },
   {
-    id: 'breaker', name: 'NEON BREAKER', short: 'BREAKER', icon: '🧱', color: '#ff2a6d', path: 'games/breaker/',
+    id: 'breaker', name: 'NEON BREAKER', short: 'BREAKER', icon: '🧱', color: '#ff2a6d', path: 'games/breaker/index.html',
     tagline: 'Smash the neon wall. Multi-ball, lasers and a wall that fights back.',
     genre: 'ACTION', added: '2026-10-01',
     xp: s => 15 + Math.floor((s.score || 0) / 35) + ((s.level || 1) - 1) * 25,
     shards: s => Math.floor((s.score || 0) / 90) + ((s.level || 1) - 1) * 4,
   },
   {
-    id: 'drift', name: 'VOID DRIFT', short: 'DRIFT', icon: '🛸', color: '#ffd700', path: 'games/drift/',
+    id: 'drift', name: 'VOID DRIFT', short: 'DRIFT', icon: '🛸', color: '#ffd700', path: 'games/drift/index.html',
     tagline: 'Vector-space survival. Thrust, wrap, split rocks and hunt the saucers.',
     genre: 'SHOOTER', added: '2026-10-01',
     xp: s => 15 + Math.floor((s.score || 0) / 90) + ((s.wave || 1) - 1) * 20,
