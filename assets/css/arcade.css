@@ -71,11 +71,22 @@ body.reduce-motion *, body.reduce-motion *::before, body.reduce-motion *::after 
 
 /* ── Toggles ── */
 .na-toggle { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 0; font-weight: 600; font-size: 1rem; cursor: pointer; }
-.na-toggle input { appearance: none; width: 46px; height: 26px; border-radius: 99px; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--line2); position: relative; cursor: pointer; transition: background .2s; flex: none; }
-.na-toggle input::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--dim); transition: transform .2s var(--pop), background .2s; }
-.na-toggle input:checked { background: color-mix(in srgb, var(--a1) 35%, transparent); border-color: var(--a1); }
-.na-toggle input:checked::after { transform: translateX(20px); background: var(--a1); box-shadow: 0 0 10px var(--a1); }
-.na-range { width: 100%; accent-color: var(--a1); }
+.na-toggle input[type=checkbox] { appearance: none; -webkit-appearance: none; width: 46px; height: 26px; border-radius: 99px; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--line2); position: relative; cursor: pointer; transition: background .2s; flex: none; }
+.na-toggle input[type=checkbox]::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--dim); transition: transform .2s var(--pop), background .2s; }
+.na-toggle input[type=checkbox]:checked { background: color-mix(in srgb, var(--a1) 35%, transparent); border-color: var(--a1); }
+.na-toggle input[type=checkbox]:checked::after { transform: translateX(20px); background: var(--a1); box-shadow: 0 0 10px var(--a1); }
+/* volume row */
+.na-vol { display: grid; grid-template-columns: auto 1fr 3.2em; align-items: center; gap: 14px; padding: 12px 0; font-weight: 600; font-size: 1rem; }
+.na-vol b { font-family: var(--font); font-size: .72rem; text-align: right; color: var(--a1); font-variant-numeric: tabular-nums; }
+.na-range { --p: 70%; -webkit-appearance: none; appearance: none; width: 100%; height: 28px; background: transparent; cursor: pointer; touch-action: none; margin: 0; }
+.na-range::-webkit-slider-runnable-track { height: 6px; border-radius: 99px; background: linear-gradient(90deg, var(--a1) 0 var(--p), rgba(255, 255, 255, .12) var(--p) 100%); }
+.na-range::-moz-range-track { height: 6px; border-radius: 99px; background: rgba(255, 255, 255, .12); }
+.na-range::-moz-range-progress { height: 6px; border-radius: 99px; background: var(--a1); }
+.na-range::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; margin-top: -7px; border-radius: 50%; background: #fff; border: 3px solid var(--a1); box-shadow: 0 0 12px var(--a1); transition: transform .15s; }
+.na-range::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 3px solid var(--a1); box-shadow: 0 0 12px var(--a1); }
+.na-range:active::-webkit-slider-thumb { transform: scale(1.2); }
+.na-range:focus-visible { outline: none; }
+.na-range:focus-visible::-webkit-slider-thumb { outline: 2px solid #fff; outline-offset: 2px; }
 
 /* ── Toasts ── */
 .na-toasts { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 9500; display: flex; flex-direction: column; gap: 8px; pointer-events: none; width: min(92vw, 380px); }
@@ -216,7 +227,7 @@ body.touch .gs-touch.has-btns { display: flex; }
 .gs-tbtn small { font-size: .5rem; letter-spacing: .1em; display: block; margin-top: -4px; opacity: .8; }
 .gs-tbtn.on { background: color-mix(in srgb, var(--gc) 30%, transparent); transform: scale(.94); box-shadow: 0 0 18px color-mix(in srgb, var(--gc) 40%, transparent); }
 .gs-tbtn.wide { flex-grow: 1.4; max-width: 104px; }
-.gs-tbtn:has(small), .gs-tbtn[aria-label=HOLD], .gs-tbtn[aria-label=Hyperspace] { font-size: .78rem; }
+.gs-tbtn.txt { font-size: .7rem; letter-spacing: .04em; }
 
 .gs-pause-hint { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); font-family: var(--font); font-size: .55rem; letter-spacing: .18em; color: var(--dim2); pointer-events: none; }
 

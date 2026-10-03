@@ -7,7 +7,9 @@
 const A = window.Arcade, G = A.gfx;
 const { esc, fmt } = A.util;
 const $ = s => document.querySelector(s);
-const NEW_SINCE = '2026-06-01';
+const NEW_SINCE = '2026-10-03';
+const CATS = { action: ['snake', 'flight', 'breaker', 'drift', 'drifter'], puzzle: ['stack', 'memory', 'gems'], skill: ['typer', 'pool'] };
+let libFilter = 'all';
 
 let tab = 'arcade', achFilter = 'all', vaultFilter = 'avatar';
 
@@ -126,6 +128,83 @@ const PREVIEW = {
     c.strokeStyle = 'rgba(0,240,255,0.25)'; c.lineWidth = 6; c.stroke(); c.strokeStyle = '#00f0ff'; c.lineWidth = 2; c.stroke(); c.restore();
     for (let i = 0; i < 3; i++) { const d = ((t * 160 + i * 50) % 150); c.fillStyle = '#fff'; c.fillRect(sx + Math.cos(a) * (16 + d), sy + Math.sin(a) * (16 + d), 2.5, 2.5); }
   },
+  drifter(c, w, h, t) {
+    c.fillStyle = '#05040c'; c.fillRect(0, 0, w, h);
+    c.strokeStyle = 'rgba(255,138,0,0.06)'; for (let x = 0; x < w; x += 22) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, h); c.stroke(); }
+    const cx = w * 0.5, cy = h * 0.62, rx = w * 0.42, ry = h * 0.45;
+    c.lineWidth = h * 0.3; c.strokeStyle = '#120d24'; c.beginPath(); c.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2); c.stroke();
+    c.lineWidth = 2; c.strokeStyle = '#00f0ff'; c.beginPath(); c.ellipse(cx, cy, rx + h * 0.15, ry + h * 0.15, 0, 0, Math.PI * 2); c.stroke();
+    c.strokeStyle = '#ff2a6d'; c.beginPath(); c.ellipse(cx, cy, rx - h * 0.15, ry - h * 0.15, 0, 0, Math.PI * 2); c.stroke();
+    const a = t * 1.3, x = cx + Math.cos(a) * rx, y = cy + Math.sin(a) * ry, head = a + Math.PI / 2 + 0.55;
+    for (let i = 1; i < 18; i++) { const b = a - i * 0.06; c.fillStyle = `rgba(255,42,109,${0.4 - i * 0.02})`; for (const s of [-1, 1]) c.fillRect(cx + Math.cos(b) * (rx + s * 5) - 1.5, cy + Math.sin(b) * (ry + s * 5) - 1.5, 3, 3); }
+    c.save(); c.translate(x, y); c.rotate(head);
+    c.drawImage(G.softGlow('#ff8a00', 30), -30, -30, 60, 60);
+    c.fillStyle = '#ff8a00'; c.beginPath(); c.roundRect(-13, -7, 26, 14, 4); c.fill(); c.fillStyle = '#ffd36b'; c.fillRect(-13, -1.5, 26, 3); c.fillStyle = '#111'; c.fillRect(1, -5, 6, 10);
+    c.restore();
+    c.drawImage(G.softGlow('#ffffff', 30), x - 50 - Math.cos(a) * 10, y - 20, 50, 40);
+  },
+  typer(c, w, h, t) {
+    c.fillStyle = '#04060f'; c.fillRect(0, 0, w, h);
+    const word = 'neon arcade', shown = Math.floor((t * 6) % (word.length + 8));
+    c.font = `500 ${Math.round(h * 0.17)}px "JetBrains Mono", ui-monospace, monospace`; c.textAlign = 'left'; c.textBaseline = 'middle';
+    const tw = c.measureText(word).width, x0 = (w - tw) / 2, cw = tw / word.length;
+    for (let i = 0; i < word.length; i++) { c.fillStyle = i < shown ? '#b6ff00' : 'rgba(255,255,255,0.25)'; c.fillText(word[i], x0 + i * cw, h * 0.36); }
+    const cx = x0 + Math.min(shown, word.length) * cw; c.fillStyle = '#b6ff00'; c.fillRect(cx, h * 0.27, 2, h * 0.18);
+    const rows = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'], k = Math.min(w / 12, h / 6.5);
+    const hot = word[Math.min(shown, word.length - 1)];
+    rows.forEach((r, ri) => [...r].forEach((ch, i) => {
+      const x = w / 2 - r.length * k / 2 + i * k + ri * k * 0.3, y = h * 0.56 + ri * (k + 3);
+      const lit = ch === hot && shown < word.length;
+      c.fillStyle = lit ? 'rgba(182,255,0,0.35)' : 'rgba(255,255,255,0.04)'; c.strokeStyle = lit ? '#b6ff00' : 'rgba(0,240,255,0.3)';
+      c.beginPath(); c.roundRect(x, y, k - 4, k - 4, 4); c.fill(); c.stroke();
+    }));
+    c.font = `900 ${Math.round(h * 0.09)}px Orbitron, monospace`; c.textAlign = 'right'; c.fillStyle = '#00f0ff'; c.fillText(`${60 + Math.round(Math.sin(t) * 12)} WPM`, w - 10, h * 0.12);
+  },
+  memory(c, w, h, t) {
+    c.fillStyle = '#0a0414'; c.fillRect(0, 0, w, h);
+    const cols = 5, rows = 2, cw = Math.min(w / (cols + 1), h / (rows * 1.45)), ch = cw * 1.3;
+    const ox = (w - cols * (cw + 6)) / 2, oy = (h - rows * (ch + 6)) / 2;
+    const cols8 = ['#00f0ff', '#ff2a6d', '#ffe600', '#00ff66', '#c04bff'];
+    for (let r = 0; r < rows; r++) for (let i = 0; i < cols; i++) {
+      const k = r * cols + i, up = Math.sin(t * 1.6 + k * 1.3) > 0.45 || (k === 2 || k === 7);
+      const x = ox + i * (cw + 6), y = oy + r * (ch + 6), col = cols8[(k * 3 + r) % 5];
+      c.fillStyle = up ? '#0d0d26' : 'rgba(255,79,216,0.14)'; c.strokeStyle = up ? col : '#ff4fd8'; c.lineWidth = 1.5;
+      c.beginPath(); c.roundRect(x, y, cw, ch, 6); c.fill(); c.stroke();
+      if (up) { c.fillStyle = col; c.beginPath(); c.arc(x + cw / 2, y + ch / 2, cw * 0.22, 0, Math.PI * 2); c.fill(); }
+    }
+  },
+  gems(c, w, h, t) {
+    c.fillStyle = '#070a24'; c.fillRect(0, 0, w, h);
+    const n = 8, s = Math.min(w / (n + 1), h / 5.2), ox = (w - n * s) / 2, oy = (h - 4.4 * s) / 2;
+    const cols = ['#ff2a6d', '#ff8a00', '#ffe600', '#00ff66', '#00b3ff', '#c04bff'];
+    for (let r = 0; r < 4; r++) for (let i = 0; i < n; i++) {
+      const k = (r * 7 + i * 3 + (i > 2 && i < 6 && r === 1 ? 0 : 1)) % 6, col = r === 1 && i > 2 && i < 6 ? cols[2] : cols[k];
+      const pulse = r === 1 && i > 2 && i < 6 ? 1 + Math.max(0, Math.sin(t * 4)) * 0.18 : 1;
+      const x = ox + (i + 0.5) * s, y = oy + (r + 0.5) * s * 1.1, rr = s * 0.34 * pulse;
+      c.fillStyle = col; c.beginPath();
+      if (k % 3 === 0) c.arc(x, y, rr, 0, Math.PI * 2); else if (k % 3 === 1) { c.moveTo(x, y - rr); c.lineTo(x + rr, y); c.lineTo(x, y + rr); c.lineTo(x - rr, y); } else c.rect(x - rr * 0.8, y - rr * 0.8, rr * 1.6, rr * 1.6);
+      c.fill();
+    }
+    c.drawImage(G.softGlow('#ffe600', 40), ox + 2.5 * s, oy + 0.6 * s, s * 3, s * 1.4);
+  },
+  pool(c, w, h, t) {
+    c.fillStyle = '#03030d'; c.fillRect(0, 0, w, h);
+    const tw = w * 0.84, th = Math.min(h * 0.78, tw / 2), x0 = (w - tw) / 2, y0 = (h - th) / 2;
+    c.fillStyle = '#0b1a26'; c.beginPath(); c.roundRect(x0 - 8, y0 - 8, tw + 16, th + 16, 10); c.fill();
+    c.strokeStyle = '#19ffd2'; c.lineWidth = 1.5; c.stroke();
+    c.fillStyle = '#063a35'; c.fillRect(x0, y0, tw, th);
+    [[0, 0], [tw / 2, 0], [tw, 0], [0, th], [tw / 2, th], [tw, th]].forEach(([px, py]) => { c.fillStyle = '#000'; c.beginPath(); c.arc(x0 + px, y0 + py, 6, 0, Math.PI * 2); c.fill(); });
+    const r = th * 0.06, cols = ['#ffd400', '#2f6bff', '#ff2a3d', '#b04bff', '#141414', '#ff8a00'];
+    const hit = (t * 0.5) % 1;
+    for (let row = 0; row < 3; row++) for (let k = 0; k <= row; k++) {
+      const bx = x0 + tw * 0.68 + row * r * 1.8 + (hit > 0.5 ? (row + 1) * (hit - 0.5) * 30 : 0), by = y0 + th / 2 + (k - row / 2) * r * 2.1 + (hit > 0.5 ? (k - row / 2) * (hit - 0.5) * 40 : 0);
+      c.fillStyle = cols[(row * 2 + k) % 6]; c.beginPath(); c.arc(bx, by, r, 0, Math.PI * 2); c.fill();
+    }
+    const cxp = hit < 0.5 ? x0 + tw * 0.25 + hit * 2 * tw * 0.4 : x0 + tw * 0.62, cyp = y0 + th / 2;
+    c.fillStyle = '#fff'; c.beginPath(); c.arc(cxp, cyp, r, 0, Math.PI * 2); c.fill();
+    if (hit < 0.5) { c.strokeStyle = '#ffd36b'; c.lineWidth = 3; c.beginPath(); c.moveTo(cxp - r - 6 - (0.5 - hit) * 20, cyp); c.lineTo(cxp - r - 90, cyp); c.stroke(); }
+    c.strokeStyle = 'rgba(255,255,255,0.35)'; c.setLineDash([3, 4]); c.lineWidth = 1; c.beginPath(); c.moveTo(cxp + r, cyp); c.lineTo(x0 + tw * 0.68 - r, cyp); c.stroke(); c.setLineDash([]);
+  },
 };
 const previews = [];
 function mountPreviews() {
@@ -177,6 +256,7 @@ function gameAchProgress(id) { const list = A.ACHIEVEMENTS.filter(a => a.game ==
 function isNew(g) { return g.added >= NEW_SINCE && !A.state().games[g.id].plays; }
 function scoreText(g, rec) {
   if (g.id === 'stack' && rec.mins.sprintMs && !rec.best) return A.util.fmtTime(rec.mins.sprintMs);
+  if (g.id === 'typer') { const w = Math.max(rec.bests.t30 || 0, rec.bests.t60 || 0); return w ? w + ' WPM' : fmt(rec.best); }
   return fmt(rec.best);
 }
 function relTime(ts) {
@@ -189,7 +269,7 @@ function heroBlock() {
   const last = st.history[0] && A.gameById(st.history[0].game);
   const fresh = A.GAMES.find(isNew);
   const streak = A.liveStreak(), playedToday = st.lastPlay === A.util.dateKey();
-  let msg = 'Five neon classics, one account. Every run earns XP, shards and progress toward rewards in the Vault.';
+  let msg = `${A.GAMES.length} neon games, one account. Every run earns XP, shards and progress toward rewards in the Vault.`;
   if (ready) msg = `You have ${ready} quest reward${ready > 1 ? 's' : ''} ready to claim.`;
   else if (streak >= 1 && !playedToday) msg = `Play a run today to keep your ${streak}-day streak alive.`;
   else if (open) msg = `${open} daily quest${open > 1 ? 's' : ''} left today. Quests reset at midnight.`;
@@ -215,7 +295,8 @@ function heroBlock() {
 }
 function gameCards() {
   const st = A.state();
-  return `<div class="games">${A.GAMES.map(g => {
+  const list = A.GAMES.filter(g => libFilter === 'all' || (libFilter === 'new' ? g.added >= NEW_SINCE : (CATS[libFilter] || []).includes(g.id)));
+  return `<div class="games">${list.map(g => {
     const rec = st.games[g.id]; const [got, all] = gameAchProgress(g.id);
     return `<a class="gcard" href="${g.path}" style="--gc:${g.color}" aria-label="Play ${esc(g.name)}">
       <canvas data-preview="${g.id}" aria-hidden="true"></canvas><div class="gcard-scan"></div>
@@ -258,7 +339,8 @@ function renderArcade() {
   $('#sec-arcade').innerHTML = `
     ${heroBlock()}
     <div class="sec-hd"><div class="sec-t">GAME LIBRARY</div><div class="sec-x">${A.GAMES.length} TITLES</div></div>
-    ${gameCards()}
+    <div class="chips" role="group" aria-label="Filter games">${[['all', 'ALL'], ['new', '✦ NEW'], ['action', 'ACTION'], ['puzzle', 'PUZZLE'], ['skill', 'SKILL']].map(([id, l]) => `<button class="chip${libFilter === id ? ' on' : ''}" data-libf="${id}">${l}</button>`).join('')}</div>
+    <div id="libGrid">${gameCards()}</div>
     <div class="sec-hd"><div class="sec-t">TODAY'S QUESTS</div><button class="sec-x" data-goto="quests">ALL QUESTS ›</button></div>
     ${questCards(true)}
     <div class="sec-hd"><div class="sec-t">RECENT RUNS</div></div>
@@ -357,6 +439,11 @@ function renderProfile() {
     stack: rec => [['Marathon best', fmt(rec.bests.marathon || 0)], ['Sprint 40', rec.mins.sprintMs ? A.util.fmtTime(rec.mins.sprintMs) : '—'], ['Ultra best', fmt(rec.bests.ultra || 0)], ['Lines cleared', fmt(rec.totals.lines || 0)]],
     breaker: rec => [['Best score', fmt(rec.best)], ['Highest level', rec.maxes.level || 0], ['Bricks broken', fmt(rec.totals.bricks || 0)], ['Power-ups', fmt(rec.totals.powerups || 0)]],
     drift: rec => [['Best score', fmt(rec.best)], ['Highest wave', rec.maxes.wave || 0], ['Asteroids', fmt(rec.totals.rocks || 0)], ['Saucers', fmt(rec.totals.ufos || 0)]],
+    drifter: rec => [['Best score', fmt(rec.best)], ['Best drift', fmt(rec.maxes.bestDrift || 0)], ['Best chain', '×' + (rec.maxes.maxCombo || 0)], ['Drifts banked', fmt(rec.totals.drifts || 0)]],
+    typer: rec => [['Best WPM', (rec.maxes.wpm || 0) + ' WPM'], ['Best accuracy', (rec.maxes.accuracy || 0) + '%'], ['Storm best', fmt(rec.bests.storm || 0)], ['Words typed', fmt(rec.totals.words || 0)]],
+    memory: rec => [['Best score', fmt(rec.best)], ['Stages cleared', (rec.maxes.stage || 0) + '/6'], ['Best chain', rec.maxes.maxCombo || 0], ['Pairs matched', fmt(rec.totals.pairs || 0)]],
+    gems: rec => [['Blitz best', fmt(rec.bests.blitz || 0)], ['30 Moves best', fmt(rec.bests.moves || 0)], ['Best cascade', '×' + (rec.maxes.maxCascade || 0)], ['Specials', fmt(rec.totals.specials || 0)]],
+    pool: rec => [['8-ball wins', fmt(rec.totals.wins || 0)], ['Rush best', fmt(rec.bests.rush || 0)], ['Balls potted', fmt(rec.totals.pots || 0)], ['Best run', rec.maxes.maxRun || 0]],
   };
   $('#sec-profile').innerHTML = `
     <div class="pcard" style="--tc:${tr.color}">
@@ -438,13 +525,13 @@ function settingsModal() {
   openModal(`<div class="modal-hd"><h3>SETTINGS</h3><button class="na-icon-btn" data-close aria-label="Close">✕</button></div>
     <label class="na-toggle">Music <input type="checkbox" data-set="music" ${s.music ? 'checked' : ''}></label>
     <label class="na-toggle">Sound effects <input type="checkbox" data-set="sfx" ${s.sfx ? 'checked' : ''}></label>
-    <label class="na-toggle" style="flex-direction:column;align-items:stretch;gap:6px">Volume <input class="na-range" type="range" min="0" max="1" step="0.05" value="${s.volume}" data-set="volume"></label>
+    ${A.volumeRow()}
     <label class="na-toggle">Screen shake <input type="checkbox" data-set="shake" ${s.shake ? 'checked' : ''}></label>
     <label class="na-toggle">CRT scanlines <input type="checkbox" data-set="crt" ${s.crt ? 'checked' : ''}></label>
     <label class="na-toggle">Reduce motion <input type="checkbox" data-set="reduceMotion" ${s.reduceMotion ? 'checked' : ''}></label>
     <p style="margin-top:12px;font-size:.9rem">Settings apply to the hub and every game.${A.storageOK() ? '' : ' <b style="color:var(--bad)">Your browser is blocking storage, so progress cannot be saved.</b>'}</p>`, card => {
-    card.addEventListener('change', e => { const k = e.target.dataset.set; if (!k) return; A.setSetting(k, e.target.type === 'checkbox' ? e.target.checked : parseFloat(e.target.value)); if (k === 'music') A.settings().music ? startMusic() : A.audio.stopMusic(); renderHeader(); });
-    card.addEventListener('input', e => { if (e.target.dataset.set === 'volume') A.setSetting('volume', parseFloat(e.target.value)); });
+    card.addEventListener('change', e => { const k = e.target.dataset.set; if (!k || k === 'volume') return; A.setSetting(k, e.target.checked); if (k === 'music') A.settings().music ? startMusic() : A.audio.stopMusic(); renderHeader(); });
+    A.bindVolume(card);
   });
 }
 function confirmBuy(r) {
@@ -501,6 +588,7 @@ $('#main').addEventListener('click', e => {
     return;
   }
   const rr = t.closest('[data-reroll]'); if (rr) { if (A.rerollQuest(+rr.dataset.reroll)) { A.audio.sfx('select'); renderAll(); } return; }
+  const lf = t.closest('[data-libf]'); if (lf) { libFilter = lf.dataset.libf; A.audio.sfx('click'); document.querySelectorAll('[data-libf]').forEach(b => b.classList.toggle('on', b === lf)); $('#libGrid').innerHTML = gameCards(); mountPreviews(); return; }
   const af = t.closest('[data-achf]'); if (af) { achFilter = af.dataset.achf; A.audio.sfx('click'); renderAchievements(); return; }
   const vf = t.closest('[data-vaultf]'); if (vf) { vaultFilter = vf.dataset.vaultf; A.audio.sfx('click'); renderVault(); return; }
   const eq = t.closest('[data-equip]'); if (eq) { A.equip(eq.dataset.equip); A.audio.sfx('select'); renderAll(); return; }

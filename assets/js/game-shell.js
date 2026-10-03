@@ -137,7 +137,7 @@ function create(opts) {
       <div class="gs-settings">
         <label class="na-toggle">Music <input type="checkbox" data-set="music" ${s.music ? 'checked' : ''}></label>
         <label class="na-toggle">Sound effects <input type="checkbox" data-set="sfx" ${s.sfx ? 'checked' : ''}></label>
-        <label class="na-toggle" style="flex-direction:column;align-items:stretch;gap:6px">Volume <input class="na-range" type="range" min="0" max="1" step="0.05" value="${s.volume}" data-set="volume"></label>
+        ${A.volumeRow()}
         <label class="na-toggle">Screen shake <input type="checkbox" data-set="shake" ${s.shake ? 'checked' : ''}></label>
         <label class="na-toggle">CRT scanlines <input type="checkbox" data-set="crt" ${s.crt ? 'checked' : ''}></label>
         <label class="na-toggle">Reduce motion <input type="checkbox" data-set="reduceMotion" ${s.reduceMotion ? 'checked' : ''}></label>
@@ -247,26 +247,28 @@ function create(opts) {
     else if (act === 'music') { A.setSetting('music', !A.settings().music); updateMusicBtn(); if (A.settings().music && api.state === 'playing') A.audio.playMusic(opts.music || 'hub'); }
   });
   app.addEventListener('change', e => {
-    const k = e.target.dataset.set; if (!k) return;
-    A.setSetting(k, e.target.type === 'checkbox' ? e.target.checked : parseFloat(e.target.value));
-    if (k === 'music') updateMusicBtn();
+    const k = e.target.dataset.set; if (!k || k === 'volume') return;
+    A.setSetting(k, e.target.checked);
+    if (k === 'music') { updateMusicBtn(); if (A.settings().music) { A.audio.playMusic(opts.music || 'hub'); A.audio.pauseMusic(api.state !== 'playing' && api.state !== 'menu'); } }
   });
-  app.addEventListener('input', e => { if (e.target.dataset.set === 'volume') A.setSetting('volume', parseFloat(e.target.value)); });
+  A.bindVolume(app);
 
   const GAME_KEYS = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space']);
   global.addEventListener('keydown', e => {
     if (e.target.tagName === 'INPUT' && e.target.type !== 'checkbox' && e.target.type !== 'range') return;
     const code = e.code;
-    if (code === 'KeyM' && !e.repeat) { musicBtn.click(); return; }
+    const typing = opts.textInput && api.state === 'playing';
+    if (code === 'KeyM' && !e.repeat && !typing) { musicBtn.click(); return; }
     if (api.state === 'playing') {
-      if ((code === 'Escape' || code === 'KeyP') && !e.repeat) { pause(); e.preventDefault(); return; }
+      if ((code === 'Escape' || (code === 'KeyP' && !typing)) && !e.repeat) { pause(); e.preventDefault(); return; }
+      if (typing && (code === 'Backspace' || code === 'Quote' || code === 'Slash')) e.preventDefault();
       if (GAME_KEYS.has(code)) e.preventDefault();
       api.keys.add(code);
       opts.onKey && opts.onKey(code, true, e);
       return;
     }
     if (api.state === 'paused') { if ((code === 'Escape' || code === 'KeyP') && !e.repeat) { resume(); e.preventDefault(); } return; }
-    if (api.state === 'menu' && (code === 'Enter' || code === 'Space') && !e.repeat && !e.target.closest?.('button,a')) { e.preventDefault(); start(); return; }
+    if (api.state === 'menu' && (code === 'Enter' || code === 'Space') && !e.repeat && !e.target.closest?.('button:not([data-mode]):not([data-skin]),a,input')) { e.preventDefault(); start(); return; }
     if (api.state === 'menu' && (code === 'ArrowUp' || code === 'ArrowDown') && opts.modes?.length > 1) {
       e.preventDefault();
       const i = opts.modes.findIndex(m => m.id === api.mode);
@@ -287,7 +289,7 @@ function create(opts) {
   /* ── touch buttons ── */
   const touchBar = app.querySelector('.gs-touch');
   if (opts.touch) {
-    const group = list => `<div class="gs-tgroup">${list.map(b => `<button class="gs-tbtn${b.wide ? ' wide' : ''}" data-tkey="${b.key}" aria-label="${esc(b.aria || b.label)}">${b.label}${b.sub ? `<small>${b.sub}</small>` : ''}</button>`).join('')}</div>`;
+    const group = list => `<div class="gs-tgroup">${list.map(b => `<button class="gs-tbtn${b.wide ? ' wide' : ''}${String(b.label).length > 2 ? ' txt' : ''}" data-tkey="${b.key}" aria-label="${esc(b.aria || b.label)}">${b.label}${b.sub ? `<small>${b.sub}</small>` : ''}</button>`).join('')}</div>`;
     touchBar.innerHTML = group(opts.touch.left || []) + group(opts.touch.right || []);
     touchBar.classList.add('has-btns');
     touchBar.querySelectorAll('[data-tkey]').forEach(b => {

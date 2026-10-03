@@ -65,6 +65,41 @@ const GAMES = [
     xp: s => 15 + Math.floor((s.score || 0) / 90) + ((s.wave || 1) - 1) * 20,
     shards: s => Math.floor((s.score || 0) / 220) + ((s.wave || 1) - 1) * 3 + (s.ufos || 0) * 5,
   },
+  {
+    id: 'drifter', name: 'NEON DRIFTER', short: 'DRIFTER', icon: '🏎️', color: '#ff8a00', path: 'games/drifter/index.html',
+    tagline: 'Old-school top-down drifting. Slide the corners, chain combos, bank the points.',
+    genre: 'RACING', added: '2026-10-03',
+    xp: s => 15 + Math.floor((s.score || 0) / 220) + (s.laps || 0) * 12,
+    shards: s => Math.floor((s.score || 0) / 900) + (s.laps || 0) * 3,
+  },
+  {
+    id: 'typer', name: 'KEYSTORM', short: 'KEYSTORM', icon: '⌨️', color: '#b6ff00', path: 'games/typer/index.html',
+    tagline: 'Type fast, type clean. Speed tests with live WPM, and a word storm to survive.',
+    genre: 'TYPING', added: '2026-10-03',
+    xp: s => 15 + (s.words || 0) * 2 + Math.round((s.wpm || 0) * 0.6),
+    shards: s => Math.floor((s.words || 0) / 3) + Math.floor((s.wpm || 0) / 10),
+  },
+  {
+    id: 'memory', name: 'MIND MATCH', short: 'MATCH', icon: '🃏', color: '#ff4fd8', path: 'games/memory/index.html',
+    tagline: 'Flip, remember, match. Six stages of growing grids against the clock.',
+    genre: 'MEMORY', added: '2026-10-03',
+    xp: s => 15 + Math.floor((s.score || 0) / 40) + (s.stage || 0) * 15,
+    shards: s => Math.floor((s.score || 0) / 160) + (s.stage || 0) * 3,
+  },
+  {
+    id: 'gems', name: 'NEON GEMS', short: 'GEMS', icon: '💠', color: '#4d7cff', path: 'games/gems/index.html',
+    tagline: 'Swap, match three, trigger cascades. Line gems, bombs and prisms.',
+    genre: 'MATCH-3', added: '2026-10-03',
+    xp: s => 15 + Math.floor((s.score || 0) / 260),
+    shards: s => Math.floor((s.score || 0) / 1100) + (s.specials || 0),
+  },
+  {
+    id: 'pool', name: 'NEON POOL', short: 'POOL', icon: '🎱', color: '#19ffd2', path: 'games/pool/index.html',
+    tagline: '8-ball against the CPU, or a three-minute potting rush. Line it up.',
+    genre: 'SPORTS', added: '2026-10-03',
+    xp: s => 15 + Math.floor((s.score || 0) / 30) + (s.win ? 100 : 0),
+    shards: s => Math.floor((s.score || 0) / 120) + (s.win ? 25 : 0),
+  },
 ];
 const gameById = id => GAMES.find(g => g.id === id);
 
@@ -104,6 +139,11 @@ const REWARDS = [
   R('av_block',  'avatar', 'Block',    { ach: 'stack_quad' }, { glyph: '🧩' }),
   R('av_brick',  'avatar', 'Brick',    { ach: 'breaker_lv3' }, { glyph: '🧱' }),
   R('av_comet',  'avatar', 'Comet',    { ach: 'drift_wave5' }, { glyph: '☄️' }),
+  R('av_car',    'avatar', 'Racer',    { ach: 'drifter_finish' }, { glyph: '🏎️' }),
+  R('av_keys',   'avatar', 'Keys',     { ach: 'typer_40' },  { glyph: '⌨️' }),
+  R('av_card',   'avatar', 'Joker',    { ach: 'memory_s3' }, { glyph: '🃏' }),
+  R('av_jewel',  'avatar', 'Jewel',    { ach: 'gems_10k' },  { glyph: '💠' }),
+  R('av_8ball',  'avatar', 'Eight',    { ach: 'pool_win' },  { glyph: '🎱' }),
   R('av_gem',    'avatar', 'Shard',    { cost: 150 },     { glyph: '💎' }),
   R('av_bolt',   'avatar', 'Bolt',     { cost: 200 },     { glyph: '⚡' }),
   R('av_skull',  'avatar', 'Static',   { cost: 300, level: 8 }, { glyph: '💀' }),
@@ -123,6 +163,11 @@ const REWARDS = [
   R('ti_wrecker', 'title', 'WALL WRECKER',    { ach: 'breaker_lv5' }),
   R('ti_void',    'title', 'VOID HUNTER',     { ach: 'drift_wave10' }),
   R('ti_regular', 'title', 'ARCADE REGULAR',  { ach: 'arc_runs100' }),
+  R('ti_drift',   'title', 'DRIFT KING',      { ach: 'drifter_50k' }),
+  R('ti_typist',  'title', 'SPEED TYPIST',    { ach: 'typer_80' }),
+  R('ti_mind',    'title', 'PHOTOGRAPHIC',    { ach: 'memory_perfect' }),
+  R('ti_jewel',   'title', 'GEM CUTTER',      { ach: 'gems_50k' }),
+  R('ti_shark',   'title', 'POOL SHARK',      { ach: 'pool_wins10' }),
   R('ti_baller',  'title', 'SHARD BARON',     { cost: 800 }),
   R('ti_night',   'title', 'NIGHT SHIFT',     { cost: 250 }),
   R('ti_legend',  'title', 'NEON LEGEND',     { level: 100 }),
@@ -175,6 +220,38 @@ const REWARDS = [
   R('drift_ruby',  'skin', 'Ruby Wing',   { cost: 200 },     { ship: '#ff2a6d', flame: '#ff8a00', bullet: '#ffd1dc' }, 'drift'),
   R('drift_ghost', 'skin', 'Phantom',     { ach: 'drift_ufo' }, { ship: '#c04bff', flame: '#00f0ff', bullet: '#f0d9ff' }, 'drift'),
   R('drift_solar', 'skin', 'Solar Flare', { ach: 'drift_wave10' }, { ship: '#ffd700', flame: '#ff4400', bullet: '#fff6c8' }, 'drift'),
+
+  // ── DRIFTER CARS ──
+  R('drifter_neon',  'skin', 'Sunset Runner', { default: true }, { body: '#ff8a00', stripe: '#ffd36b', trail: '#ff2a6d' }, 'drifter'),
+  R('drifter_cyan',  'skin', 'Ice Coupe',     { level: 4 },      { body: '#00f0ff', stripe: '#e8fdff', trail: '#2f6bff' }, 'drifter'),
+  R('drifter_venom', 'skin', 'Venom',         { cost: 250 },     { body: '#b6ff00', stripe: '#101a00', trail: '#00ff66' }, 'drifter'),
+  R('drifter_phant', 'skin', 'Phantom GT',    { ach: 'drifter_combo' }, { body: '#c04bff', stripe: '#ffffff', trail: '#ff00ff' }, 'drifter'),
+  R('drifter_gold',  'skin', 'Gold Rush',     { ach: 'drifter_50k' }, { body: '#ffd700', stripe: '#1a1200', trail: '#ff8a00' }, 'drifter'),
+
+  // ── KEYSTORM: colour + keyboard sound ──
+  R('typer_lime',  'skin', 'Blue Switch',  { default: true }, { c1: '#b6ff00', c2: '#00f0ff', snd: 'click' }, 'typer'),
+  R('typer_thock', 'skin', 'Thock Board',  { level: 3 },      { c1: '#ffb36b', c2: '#ff2a6d', snd: 'thock' }, 'typer'),
+  R('typer_type',  'skin', 'Typewriter',   { cost: 200 },     { c1: '#f2e6c9', c2: '#ff8a00', snd: 'type' }, 'typer'),
+  R('typer_laser', 'skin', 'Laser Keys',   { ach: 'typer_60' }, { c1: '#00f0ff', c2: '#ff00ff', snd: 'laser' }, 'typer'),
+  R('typer_8bit',  'skin', '8-Bit',        { ach: 'typer_rain' }, { c1: '#ffe600', c2: '#c04bff', snd: 'chip' }, 'typer'),
+
+  // ── MIND MATCH card backs ──
+  R('memory_neon',  'skin', 'Neon Grid',  { default: true }, { back: '#ff4fd8', glow: '#ff4fd8', pat: 'grid' }, 'memory'),
+  R('memory_cyan',  'skin', 'Circuit',    { level: 3 },      { back: '#00f0ff', glow: '#00f0ff', pat: 'circuit' }, 'memory'),
+  R('memory_gold',  'skin', 'Royal',      { cost: 200 },     { back: '#ffd700', glow: '#ffb300', pat: 'diamond' }, 'memory'),
+  R('memory_void',  'skin', 'Void',       { ach: 'memory_s6' }, { back: '#8f6bff', glow: '#c04bff', pat: 'stars' }, 'memory'),
+
+  // ── NEON GEMS palettes ──
+  R('gems_neon',   'skin', 'Prism',      { default: true }, { gems: ['#ff2a6d', '#ff8a00', '#ffe600', '#00ff66', '#00b3ff', '#c04bff'] }, 'gems'),
+  R('gems_candy',  'skin', 'Candy',      { level: 4 },      { gems: ['#ff77aa', '#ffb36b', '#fff27a', '#8affc1', '#7ad7ff', '#d59bff'] }, 'gems'),
+  R('gems_ember',  'skin', 'Ember',      { cost: 250 },     { gems: ['#ff1744', '#ff6a00', '#ffd000', '#ff4fd8', '#ff9e80', '#ffe0b2'] }, 'gems'),
+  R('gems_ocean',  'skin', 'Deep Sea',   { ach: 'gems_prism' }, { gems: ['#00f0ff', '#00ffaa', '#4d7cff', '#7df9ff', '#2f6bff', '#b388ff'] }, 'gems'),
+
+  // ── NEON POOL tables ──
+  R('pool_teal',   'skin', 'Teal Felt',  { default: true }, { felt: '#063a35', line: '#19ffd2', rail: '#0b1a26', cue: '#ffd36b' }, 'pool'),
+  R('pool_blue',   'skin', 'Midnight',   { level: 5 },      { felt: '#0a1650', line: '#4d7cff', rail: '#070a1c', cue: '#e8fdff' }, 'pool'),
+  R('pool_red',    'skin', 'Vegas Red',  { cost: 300 },     { felt: '#3d0614', line: '#ff2a6d', rail: '#16050b', cue: '#ffd700' }, 'pool'),
+  R('pool_violet', 'skin', 'Violet Lounge', { ach: 'pool_wins10' }, { felt: '#2a0a45', line: '#c04bff', rail: '#12051d', cue: '#00f0ff' }, 'pool'),
 ];
 const rewardById = id => REWARDS.find(r => r.id === id);
 
@@ -206,7 +283,7 @@ const ACHIEVEMENTS = [
   A('arc_quests30',  'arcade', '🗡️', 'QUEST MASTER',    'Claim 30 daily quests.',                      (g, st) => st.questsClaimed >= 30, 600, 120),
   A('arc_rich',      'arcade', '💰', 'SHARD MAGNATE',   'Earn 2,000 shards in total.',                 (g, st) => st.shardsEarned >= 2000, 400, 0),
   A('arc_collector', 'arcade', '🎁', 'COLLECTOR',       'Own 20 items from the Vault.',                (g, st) => ownedCount(st) >= 20, 400, 80),
-  A('arc_allround',  'arcade', '👑', 'ALL-ROUNDER',     'Earn a “first milestone” badge in every game.', (g, st) => ['snake_50', 'flight_25', 'stack_quad', 'breaker_lv3', 'drift_wave5'].every(id => st.ach[id]), 800, 200),
+  A('arc_allround',  'arcade', '👑', 'ALL-ROUNDER',     'Earn the first milestone badge in every game.', (g, st) => ['snake_50', 'flight_25', 'stack_quad', 'breaker_lv3', 'drift_wave5', 'drifter_finish', 'typer_40', 'memory_s3', 'gems_10k', 'pool_win'].every(id => st.ach[id]), 1000, 250),
 
   // ── SNAKE ──
   A('snake_first',   'snake', '🍎', 'FIRST BITE',     'Eat your first apple.',                 g => t(g, 'apples') >= 1, 40, 10),
@@ -258,6 +335,47 @@ const ACHIEVEMENTS = [
   A('drift_aim',     'drift', '🎯', 'SHARPSHOOTER',  'Finish a run with 60%+ accuracy (30+ shots).', g => f(g, 'sharp'), 300, 60),
   A('drift_10k',     'drift', '💫', 'STAR DUST',     'Score 10,000 in one run.',               g => g.best >= 10000, 300, 60),
   A('drift_500',     'drift', '🪨', 'ROCK BREAKER',  'Destroy 500 asteroids in total.',        g => t(g, 'rocks') >= 500, 400, 80),
+
+  // ── DRIFTER ──
+  A('drifter_first',  'drifter', '🛞', 'SIDEWAYS',       'Bank your first drift.',                 g => t(g, 'drifts') >= 1, 40, 10),
+  A('drifter_finish', 'drifter', '🏁', 'CHECKERED FLAG', 'Finish a 3-lap drift run.',              g => f(g, 'finished'), 150, 30),
+  A('drifter_big',    'drifter', '💨', 'BIG SLIDE',      'Bank a single drift worth 3,000.',       g => m(g, 'bestDrift') >= 3000, 200, 40),
+  A('drifter_combo',  'drifter', '🔥', 'CHAIN SLIDER',   'Reach a ×5 drift chain.',                g => m(g, 'maxCombo') >= 5, 250, 50),
+  A('drifter_50k',    'drifter', '👑', 'DRIFT KING',     'Score 30,000 in one run.',               g => g.best >= 30000, 400, 80),
+  A('drifter_clean',  'drifter', '✨', 'CLEAN LINE',     'Finish a run without touching a wall.',  g => f(g, 'clean'), 300, 60),
+
+  // ── KEYSTORM ──
+  A('typer_first',   'typer', '⌨️', 'HELLO WORLD',    'Type your first word.',                   g => t(g, 'words') >= 1, 40, 10),
+  A('typer_40',      'typer', '🚀', 'WARMED UP',      'Reach 40 WPM in a speed test.',           g => m(g, 'wpm') >= 40, 150, 30),
+  A('typer_60',      'typer', '⚡', 'QUICK FINGERS',  'Reach 60 WPM in a speed test.',           g => m(g, 'wpm') >= 60, 250, 50),
+  A('typer_80',      'typer', '🔥', 'BLAZING',        'Reach 80 WPM in a speed test.',           g => m(g, 'wpm') >= 80, 400, 80),
+  A('typer_perfect', 'typer', '🎯', 'FLAWLESS',       'Finish a test at 100% accuracy (25+ words).', g => f(g, 'perfect'), 250, 50),
+  A('typer_rain',    'typer', '🌧️', 'STORM CHASER',   'Survive to wave 8 in Word Storm.',        g => m(g, 'wave') >= 8, 300, 60),
+  A('typer_1k',      'typer', '📚', 'WORDSMITH',      'Type 1,000 words in total.',              g => t(g, 'words') >= 1000, 400, 80),
+
+  // ── MIND MATCH ──
+  A('memory_first',   'memory', '🃏', 'FIRST PAIR',    'Match your first pair.',                  g => t(g, 'pairs') >= 1, 40, 10),
+  A('memory_s3',      'memory', '🧠', 'SHARP MIND',    'Clear stage 3 in Arcade.',                g => m(g, 'stage') >= 3, 150, 30),
+  A('memory_s6',      'memory', '🌌', 'TOTAL RECALL',  'Clear all 6 stages in Arcade.',           g => m(g, 'stage') >= 6, 500, 100),
+  A('memory_perfect', 'memory', '📸', 'PHOTOGRAPHIC',  'Clear a stage with no mismatches.',       g => f(g, 'perfect'), 250, 50),
+  A('memory_combo',   'memory', '🔗', 'ON A STREAK',   'Match 5 pairs in a row.',                 g => m(g, 'maxCombo') >= 5, 200, 40),
+  A('memory_relax',   'memory', '🧘', 'ZEN MASTER',    'Clear Relax mode in 30 moves or fewer.',  g => f(g, 'zen30'), 250, 50),
+
+  // ── NEON GEMS ──
+  A('gems_first',   'gems', '💠', 'FIRST MATCH',   'Make your first match.',                    g => t(g, 'matches') >= 1, 40, 10),
+  A('gems_10k',     'gems', '💎', 'POLISHED',      'Score 10,000 in one game.',                 g => g.best >= 10000, 150, 30),
+  A('gems_50k',     'gems', '👑', 'CROWN JEWELS',  'Score 50,000 in one game.',                 g => g.best >= 50000, 400, 80),
+  A('gems_cascade', 'gems', '🌊', 'CASCADE',       'Trigger a ×5 cascade.',                     g => m(g, 'maxCascade') >= 5, 250, 50),
+  A('gems_prism',   'gems', '🌈', 'PRISMATIC',     'Create a prism gem (match five).',          g => t(g, 'prisms') >= 1, 250, 50),
+  A('gems_100',     'gems', '💥', 'DEMOLITION',    'Set off 100 special gems in total.',        g => t(g, 'specials') >= 100, 400, 80),
+
+  // ── NEON POOL ──
+  A('pool_first',  'pool', '🎱', 'FIRST POT',      'Pot your first ball.',                      g => t(g, 'pots') >= 1, 40, 10),
+  A('pool_win',    'pool', '🏆', 'EIGHT DOWN',     'Beat the CPU at 8-ball.',                   g => t(g, 'wins') >= 1, 200, 40),
+  A('pool_run',    'pool', '🔥', 'ON THE RUN',     'Pot 4 balls in a single turn.',             g => m(g, 'maxRun') >= 4, 250, 50),
+  A('pool_clean',  'pool', '✨', 'NO MISTAKES',    'Win 8-ball without a single foul.',         g => f(g, 'cleanWin'), 300, 60),
+  A('pool_rush',   'pool', '⏱️', 'RUSH HOUR',      'Pot 15 balls in one Time Rush.',            g => (g.bests.rush || 0) >= 1500, 300, 60),
+  A('pool_wins10', 'pool', '🦈', 'POOL SHARK',     'Win 10 games of 8-ball.',                   g => t(g, 'wins') >= 10, 500, 100),
 ];
 
 /* ─────────────────────────────────────────────────────────
@@ -289,8 +407,23 @@ const QUESTS = [
   Q('q_drf_r60',  'drift', 'sum',  'rocks', 60,   'Destroy 60 asteroids today', 180, 35),
   Q('q_drf_u1',   'drift', 'sum',  'ufos', 1,     'Shoot down a saucer', 220, 45),
   Q('q_drf_s5k',  'drift', 'best', 'score', 5000, 'Score 5,000+ in Void Drift', 240, 45),
+  Q('q_dft_d10',  'drifter', 'sum',  'drifts', 8,  'Bank 8 drifts in Neon Drifter', 180, 35),
+  Q('q_dft_s15k', 'drifter', 'best', 'score', 8000, 'Score 8,000+ in Neon Drifter', 240, 45),
+  Q('q_dft_c3',   'drifter', 'best', 'maxCombo', 3, 'Reach a ×3 drift chain', 200, 40),
+  Q('q_typ_w50',  'typer', 'best', 'wpm', 50,      'Hit 50 WPM in a Keystorm test', 220, 45),
+  Q('q_typ_100',  'typer', 'sum',  'words', 100,   'Type 100 words in Keystorm', 180, 35),
+  Q('q_typ_acc',  'typer', 'best', 'accuracy', 97, 'Finish a test at 97%+ accuracy', 200, 40),
+  Q('q_mem_s2',   'memory', 'best', 'stage', 2,    'Clear stage 2 in Mind Match', 180, 35),
+  Q('q_mem_p20',  'memory', 'sum',  'pairs', 20,   'Match 20 pairs today', 180, 35),
+  Q('q_mem_c3',   'memory', 'best', 'maxCombo', 3, 'Match 3 pairs in a row', 200, 40),
+  Q('q_gem_s8k',  'gems', 'best', 'score', 8000,   'Score 8,000+ in Neon Gems', 220, 45),
+  Q('q_gem_sp5',  'gems', 'sum',  'specials', 5,   'Set off 5 special gems', 200, 40),
+  Q('q_gem_c3',   'gems', 'best', 'maxCascade', 3, 'Trigger a ×3 cascade', 180, 35),
+  Q('q_pol_p10',  'pool', 'sum',  'pots', 10,      'Pot 10 balls in Neon Pool', 180, 35),
+  Q('q_pol_w1',   'pool', 'sum',  'wins', 1,       'Win a game of 8-ball', 260, 50),
+  Q('q_pol_r2',   'pool', 'best', 'maxRun', 2,     'Pot 2 balls in one turn', 180, 35),
   Q('q_x_var3',   'arcade', 'variety', null, 3,   'Play 3 different games today', 220, 50),
-  Q('q_x_var5',   'arcade', 'variety', null, 5,   'Play all 5 games today', 450, 100),
+  Q('q_x_var5',   'arcade', 'variety', null, 5,   'Play 5 different games today', 450, 100),
   Q('q_x_runs6',  'arcade', 'runs', null, 6,      'Play 6 runs across the arcade', 200, 40),
   Q('q_x_sh150',  'arcade', 'shards', null, 150,  'Earn 150 shards from runs today', 300, 0),
 ];
@@ -670,6 +803,24 @@ function applyBodyFlags() {
   document.body.classList.toggle('reduce-motion', !!s.reduceMotion);
 }
 
+/* volume slider markup + behaviour, shared by hub and game menus */
+function volumeRow() {
+  const v = Math.round(settings().volume * 100);
+  return `<div class="na-vol"><span>Volume</span><input class="na-range" type="range" min="0" max="100" step="1" value="${v}" style="--p:${v}%" data-set="volume" aria-label="Volume"><b>${v}%</b></div>`;
+}
+function bindVolume(root) {
+  let lastBlip = 0;
+  root.addEventListener('input', e => {
+    const r = e.target; if (r.dataset.set !== 'volume') return;
+    const v = Math.max(0, Math.min(100, parseInt(r.value, 10) || 0));
+    r.style.setProperty('--p', v + '%');
+    const lbl = r.parentElement.querySelector('b'); if (lbl) lbl.textContent = v + '%';
+    setSetting('volume', v / 100);
+    const now = performance.now();
+    if (now - lastBlip > 90 && settings().sfx) { lastBlip = now; Audio.ctx(); Audio.tone(660, 0.07, 'square', 0.14); }
+  });
+}
+
 /* ─────────────────────────────────────────────────────────
    AUDIO — synth SFX + tiny chiptune sequencer
 ───────────────────────────────────────────────────────── */
@@ -694,7 +845,8 @@ const Audio = (() => {
   function refresh() {
     if (!ac) return;
     const s = settings();
-    master.gain.value = s.volume;
+    // perceptual curve: the slider feels linear to the ear
+    master.gain.setTargetAtTime(Math.pow(Math.max(0, Math.min(1, s.volume)), 1.7), ac.currentTime, 0.015);
     sfxBus.gain.value = s.sfx ? 0.55 : 0;
     musicBus.gain.value = s.music ? 0.16 : 0;
   }
@@ -756,6 +908,11 @@ const Audio = (() => {
     stack:   { bpm: 136, bass: seq('A2 . E3 . A2 . E3 . G#2 . E3 . G#2 . E3 . A2 . E3 . A2 . E3 . B2 . E3 . G#2 . E3 .'), lead: seq('E5 . . B4 C5 . D5 . . C5 B4 . A4 . . A4 C5 . E5 . . D5 C5 . B4 . . C5 D5 . E5 .'), wave: 'square' },
     breaker: { bpm: 124, bass: seq('C2 . C3 . C2 . C3 . Eb2 . Eb3 . Eb2 . Eb3 . F2 . F3 . F2 . F3 . G2 . G3 . Bb2 . B2 .'), lead: seq('G4 . C5 . Eb5 . G5 . F5 . Eb5 . C5 . . . Bb4 . C5 . Eb5 . F5 . G5 . F5 . D5 . B4 .'), wave: 'triangle' },
     drift:   { bpm: 112, bass: seq('B1 . . B1 . . B1 . G1 . . G1 . . G1 . D2 . . D2 . . D2 . A1 . . A1 . . C#2 .'), lead: seq('F#4 . B4 . D5 . F#5 . . . E5 . D5 . B4 . . . A4 . D5 . F#5 . A5 . . . G5 . F#5 . E5 . C#5 .'), wave: 'sawtooth' },
+    drifter: { bpm: 150, bass: seq('E2 E2 E3 E2 E2 E3 E2 E3 D2 D2 D3 D2 D2 D3 D2 D3 C2 C2 C3 C2 C2 C3 C2 C3 D2 D2 D3 D2 B1 B2 D2 D3'), lead: seq('B4 . E5 . G5 . B5 . A5 . G5 . F#5 . D5 . E5 . G5 . A5 . . . G5 . F#5 . D5 . . . E5 .'), wave: 'sawtooth' },
+    typer:   { bpm: 118, bass: seq('F2 . . F2 . F3 . . Ab2 . . Ab2 . Ab3 . . Db2 . . Db2 . Db3 . . Eb2 . . Eb2 . Eb3 . .'), lead: seq('C5 . . . Ab4 . . . F4 . . . Ab4 . C5 . Db5 . . . C5 . . . Ab4 . . . Bb4 . G4 .'), wave: 'triangle' },
+    memory:  { bpm: 100, bass: seq('D2 . A2 . D3 . A2 . Bb1 . F2 . Bb2 . F2 . G1 . D2 . G2 . D2 . A1 . E2 . A2 . C#3 .'), lead: seq('F5 . E5 . D5 . A4 . . . Bb4 . A4 . G4 . D5 . . . C5 . Bb4 . A4 . E4 . F4 . G4 . A4 .'), wave: 'triangle' },
+    gems:    { bpm: 126, bass: seq('C3 . G2 . C3 . G2 . A2 . E2 . A2 . E2 . F2 . C3 . F2 . C3 . G2 . D3 . G2 . B2 .'), lead: seq('E5 G5 C6 . G5 E5 . . C5 E5 A5 . E5 C5 . . A4 C5 F5 . C5 A4 . . B4 D5 G5 . D5 B4 . .'), wave: 'square' },
+    pool:    { bpm: 92,  bass: seq('A1 . . . C2 . . . D2 . . . E2 . G2 . A1 . . . C2 . . . D2 . . . Eb2 . E2 .'), lead: seq('. . E4 G4 A4 . . . . . C5 . A4 . G4 . . . E4 G4 A4 . . . D5 . C5 . A4 . . .'), wave: 'triangle' },
   };
   let musicTimer = null, track = null, step = 0, nextTime = 0, musicPaused = false;
   function schedule() {
@@ -946,6 +1103,11 @@ function rewardSwatch(r) {
   if (r.game === 'stack') return d.pieces.slice(0, 4);
   if (r.game === 'breaker') return [d.paddle, d.ball];
   if (r.game === 'drift') return [d.ship, d.flame];
+  if (r.game === 'drifter') return [d.body, d.stripe, d.trail];
+  if (r.game === 'typer') return [d.c1, d.c2];
+  if (r.game === 'memory') return [d.back, '#05051a', d.glow];
+  if (r.game === 'gems') return d.gems.slice(0, 5);
+  if (r.game === 'pool') return [d.felt, d.line, d.cue];
   return [];
 }
 
@@ -958,7 +1120,7 @@ global.Arcade = {
   reportRun, questList, claimQuest, rerollQuest,
   unlockStatus, isOwned, buy, equip, equipped, rewardIcon, rewardSwatch, ownedCount: () => ownedCount(state()),
   setProfile, displayName, exportSave, importSave, resetAll, liveStreak: () => { state(); return liveStreak(); },
-  settings, setSetting, applyTheme,
+  settings, setSetting, applyTheme, volumeRow, bindVolume,
   storageOK: () => storageOK,
   audio: Audio, ui: UI,
   gfx: { sprite, glowDot, softGlow, hexA, mixHex, Particles, Floaters },
