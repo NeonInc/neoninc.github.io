@@ -247,7 +247,7 @@ footer { margin-top: 26px; text-align: center; font-family: var(--display); font
     },
     gym: function () {
       var s = readJSON('menlyn-log-v2');
-      var sess = s && s.sessions;
+      var sess = (s && s.sessions && Object.keys(s.sessions).length) ? s.sessions : gymCloud;
       if (!sess || typeof sess !== 'object') return [{ muted: 'Start your first workout' }];
       function done(x) {
         if (!x) return false;
@@ -366,13 +366,22 @@ footer { margin-top: 26px; text-align: center; font-family: var(--display); font
      so a new phone shows your progress straight away. */
   var NC = window.NeonCloud;
   var userName = '';
+  var gymCloud = null; // workouts from the account, used until Neon Gym has been opened on this device
+  function loadGymCloud() {
+    var s = readJSON('menlyn-log-v2');
+    if (s && s.sessions && Object.keys(s.sessions).length) return Promise.resolve();
+    return NC.userRef('gym/profile').then(function (ref) { return ref.collection('sessions').get(); })
+      .then(function (q) { var m = {}; q.docs.forEach(function (d) { m[d.id] = d.data(); }); gymCloud = m; })
+      .catch(function () {});
+  }
   if (NC && NC.enabled) {
     NC.badge(document.getElementById('acct'));
     NC.onUser(function (u) {
       userName = u ? (u.name || u.email || '').split(/[\s@]/)[0] : '';
       document.getElementById('cloudNote').hidden = !!u;
       tick();
-      if (u) NC.syncAll().then(refreshStats, refreshStats);
+      if (!u) gymCloud = null;
+      if (u) NC.syncAll().then(loadGymCloud, loadGymCloud).then(refreshStats);
     });
   }
   window.addEventListener('storage', refreshStats);

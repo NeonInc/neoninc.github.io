@@ -15,6 +15,8 @@ On a phone, open the hub in Chrome and tap **⋮ → Add to Home screen**.
 ```
 index.html            The hub page
 apps.js               The list of apps on the hub (the only file to edit to add one)
+neon-cloud.js         Sign-in and cloud saves shared by all the apps
+vendor/               Firebase library files used by neon-cloud.js
 manifest.webmanifest  Install-as-app settings for the hub
 icon.svg, icon-*.png  Hub icons
 arcade/               Neon Arcade (its own README is inside)
@@ -26,6 +28,13 @@ games/ snake/ flappy/ Redirects from older arcade URLs, so old bookmarks still w
 1. Build the app in its own repo under NeonInc and turn on GitHub Pages for it.
    It will then open at `https://neoninc.github.io/<repo-name>/`.
 2. Add one entry to `apps.js` here.
+
+## Sign-in and cloud saves
+
+People can sign in with Google (top right of the hub, or the small button in each app). Their arcade
+progress, gym log and perfume watchlist then save to their own account and show up on any device.
+Without signing in, everything keeps saving on the phone as before. The code is `neon-cloud.js`;
+the details for future edits are in `CLAUDE.md`.
 
 ## How the tiles work
 

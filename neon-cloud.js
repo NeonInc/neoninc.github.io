@@ -78,10 +78,15 @@
         if (local.at) return null;
         var seen = {}, out = [];
         (cloud.watch || []).concat(local.watch || []).forEach(function (x) {
-          var id = x && (x.gk || x.q); if (!id || seen[id]) return; seen[id] = 1; out.push(x);
+          if (!x) return;
+          var a = x.gk && 'g:' + x.gk, b = x.q && 'q:' + String(x.q).toLowerCase().trim();
+          if ((a && seen[a]) || (b && seen[b]) || (!a && !b)) return;
+          if (a) seen[a] = 1; if (b) seen[b] = 1; out.push(x);
         });
         return { watch: out, at: Date.now() };
       },
+      // Once a phone's list has been uploaded, it's part of the account: stamp it so it's never merged again.
+      claim: function (local) { if (!local.at) { local.at = Date.now(); this.write(local); } return local; },
     },
   };
   // Keys that belong to a person. Cleared when a different person signs in on this device.
@@ -208,8 +213,8 @@
   function sync(id) {
     var def = BLOBS[id];
     if (!def || !CONFIG) return Promise.resolve('off');
-    return ready.then(function (u) {
-      if (!u || !user) return 'off';
+    return ready.then(function () {
+      if (!user) return 'off'; // 'ready' only reports the first sign-in state, so check the current one
       setStatus('saving');
       return readCloud(id).then(function (c) {
         var local = def.read(), cloud = c.data, result;
@@ -224,7 +229,10 @@
           result = o > 0 ? 'pushed' : o < 0 ? 'pulled' : 'same';
         }
         if (result === 'pulled') { def.write(cloud); return result; }
-        if (result === 'pushed') return writeCloud(c.ref, def, local).then(function () { return result; });
+        if (result === 'pushed') {
+          if (def.claim) local = def.claim(local);
+          return writeCloud(c.ref, def, local).then(function () { return result; });
+        }
         return result;
       });
     }).then(function (r) { if (user) setStatus('synced'); return r; },
@@ -276,10 +284,12 @@
     '.nc-badge[data-s=error] .nc-dot,.nc-badge[data-s=offline] .nc-dot{background:#ff8a00}' +
     '.nc-badge img{width:20px;height:20px;border-radius:50%;margin-left:-4px}' +
     '@keyframes ncp{50%{opacity:.35}}' +
-    '@media(max-width:600px){.nc-badge.nc-compact{padding:0 9px}.nc-badge.nc-compact .nc-t{display:none}.nc-badge.nc-compact img{margin:0}}';
+    '.nc-badge.nc-light{background:#fff;color:#1b1b2b;border-color:rgba(0,0,0,.15)}.nc-badge.nc-light:hover{border-color:#d6246e}' +
+    '@media(max-width:600px){.nc-badge.nc-compact:not([data-s=signed-out]){padding:0 9px}' +
+    '.nc-badge.nc-compact:not([data-s=signed-out]) .nc-t{display:none}.nc-badge.nc-compact img{margin:0}}';
   function firstName(u) { return (u.name || u.email || 'You').split(/[\s@]/)[0]; }
-  function badgeText() {
-    if (!user) return 'Sign in to save';
+  function badgeText(short) {
+    if (!user) return short ? 'Sign in' : 'Sign in to save';
     var n = firstName(user);
     return { saving: n + ' · saving…', offline: n + ' · offline', error: n + ' · not synced' }[status] || n + ' · saved';
   }
@@ -293,7 +303,7 @@
       b.innerHTML = '';
       if (user && user.photo) { var i = document.createElement('img'); i.src = user.photo; i.alt = ''; i.referrerPolicy = 'no-referrer'; b.appendChild(i); }
       else { var d = document.createElement('span'); d.className = 'nc-dot'; b.appendChild(d); }
-      var t = document.createElement('span'); t.className = 'nc-t'; t.textContent = badgeText(); b.appendChild(t);
+      var t = document.createElement('span'); t.className = 'nc-t'; t.textContent = badgeText(/nc-compact/.test(b.className)); b.appendChild(t);
     });
   }
   function badge(container, opts) {
