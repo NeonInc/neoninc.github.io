@@ -23,7 +23,14 @@
   'use strict';
 
   // ── Paste the Firebase web config here (Project settings → Your apps → Web app) ──
-  var CONFIG = null;
+  var CONFIG = {
+    apiKey: 'AIzaSyB0ONSpk-YMA6-g344seBIjkxBgRNkw2vY',
+    authDomain: 'neon-inc-381a8.firebaseapp.com',
+    projectId: 'neon-inc-381a8',
+    storageBucket: 'neon-inc-381a8.firebasestorage.app',
+    messagingSenderId: '565593332967',
+    appId: '1:565593332967:web:6dc49a36ca047b3a7ad642',
+  };
 
   var SDK = 'vendor/firebase-13.0.0/';
   var OWNER_KEY = 'neoncloud.owner';
