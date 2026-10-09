@@ -58,7 +58,12 @@
 
 <div class="modal" id="modal" role="dialog" aria-modal="true" hidden><div class="modal-card" id="modalCard"></div></div>
 
+<script src="../neon-cloud.js"></script>
 <script src="assets/js/arcade-core.js"></script>
 <script src="assets/js/hub.js"></script>
+<script>
+  // Sign-in button in the header (only shows once cloud saves are set up)
+  if (window.NeonCloud) NeonCloud.badge(document.querySelector('.h-ctrl'), { prepend: true, className: 'nc-compact' });
+</script>
 </body>
 </html>

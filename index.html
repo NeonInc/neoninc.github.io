@@ -71,7 +71,11 @@ header { display: flex; align-items: center; gap: 14px; margin: 8px 0 34px; }
 .brand { font-family: var(--display); font-weight: 900; letter-spacing: .14em; font-size: 22px; line-height: 1; }
 .brand span { color: var(--cyan); text-shadow: 0 0 14px rgba(0, 240, 255, .7); }
 .sub { font-family: var(--display); font-size: 10px; letter-spacing: .32em; color: var(--dim2); margin-top: 6px; }
-.clock { margin-left: auto; text-align: right; font-family: var(--display); }
+.acct { margin-left: auto; }
+.clock { margin-left: 18px; text-align: right; font-family: var(--display); }
+.stat:empty { display: none; }
+.cloud-note { color: var(--dim); font-size: 15px; margin: -14px 0 22px; }
+.cloud-note[hidden] { display: none; }
 .clock b { display: block; font-size: 20px; font-weight: 700; letter-spacing: .06em; }
 .clock small { font-size: 10px; letter-spacing: .2em; color: var(--dim2); }
 
@@ -163,7 +167,7 @@ h1 {
 footer { margin-top: 26px; text-align: center; font-family: var(--display); font-size: 10px; letter-spacing: .26em; color: var(--dim2); }
 
 @media (max-width: 520px) {
-  header { margin-bottom: 26px; }
+  header { margin-bottom: 26px; flex-wrap: wrap; }
   .clock { display: none; }
   .app { padding: 16px 16px 14px; }
   .ico { width: 52px; height: 52px; border-radius: 14px; }
@@ -184,11 +188,13 @@ footer { margin-top: 26px; text-align: center; font-family: var(--display); font
       <div class="brand">NEON <span>INC</span></div>
       <div class="sub">APP HUB</div>
     </div>
+    <div class="acct" id="acct"></div>
     <div class="clock" aria-hidden="true"><b id="time">--:--</b><small id="date"></small></div>
   </header>
 
   <h1 id="hello">Welcome back</h1>
   <p class="lede">Everything Neon Inc, one tap away.</p>
+  <p class="cloud-note" id="cloudNote" hidden>Sign in with Google to keep your progress safe and see it on any device.</p>
 
   <main class="apps" id="apps" aria-label="Neon Inc apps"></main>
 
@@ -200,6 +206,7 @@ footer { margin-top: 26px; text-align: center; font-family: var(--display); font
   <footer>NEON INC™ © <span id="yr">2026</span></footer>
 </div>
 
+<script src="neon-cloud.js"></script>
 <script src="apps.js"></script>
 <script>
 (function () {
@@ -295,7 +302,7 @@ footer { margin-top: 26px; text-align: center; font-family: var(--display); font
 
   var root = document.getElementById('apps');
   var isTouch = window.matchMedia && matchMedia('(hover: none)').matches;
-  var updatedEls = {};
+  var updatedEls = {}, statEls = {};
 
   APPS.forEach(function (app, i) {
     var a = el('div', 'app');
@@ -320,13 +327,8 @@ footer { margin-top: 26px; text-align: center; font-family: var(--display); font
     a.appendChild(top);
 
     var stat = el('div', 'stat');
-    var lines = [];
-    try { lines = STATS[app.id] ? STATS[app.id]() : []; } catch (e) { lines = []; }
-    lines.forEach(function (l) {
-      if (l.pill) stat.appendChild(el('span', 'pill', l.pill));
-      else if (l.muted) stat.appendChild(el('span', 'muted', l.muted));
-    });
-    if (lines.length) a.appendChild(stat);
+    statEls[app.id] = stat;
+    a.appendChild(stat);
 
     var foot = el('div', 'foot');
     var upd = el('span', 'upd', '');
@@ -344,6 +346,36 @@ footer { margin-top: 26px; text-align: center; font-family: var(--display); font
 
     root.appendChild(a);
   });
+
+  function refreshStats() {
+    APPS.forEach(function (app) {
+      var stat = statEls[app.id]; if (!stat) return;
+      var lines = [];
+      try { lines = STATS[app.id] ? STATS[app.id]() : []; } catch (e) { lines = []; }
+      stat.textContent = '';
+      lines.forEach(function (l) {
+        if (l.pill) stat.appendChild(el('span', 'pill', l.pill));
+        else if (l.muted) stat.appendChild(el('span', 'muted', l.muted));
+      });
+    });
+  }
+  refreshStats();
+
+  /* Cloud saves: sign in once here and every app on this site is signed in too.
+     After sign-in, saves from this device and the account are brought in line,
+     so a new phone shows your progress straight away. */
+  var NC = window.NeonCloud;
+  var userName = '';
+  if (NC && NC.enabled) {
+    NC.badge(document.getElementById('acct'));
+    NC.onUser(function (u) {
+      userName = u ? (u.name || u.email || '').split(/[\s@]/)[0] : '';
+      document.getElementById('cloudNote').hidden = !!u;
+      tick();
+      if (u) NC.syncAll().then(refreshStats, refreshStats);
+    });
+  }
+  window.addEventListener('storage', refreshStats);
 
   loadUpdated(function (data) {
     Object.keys(updatedEls).forEach(function (repo) {
@@ -363,7 +395,8 @@ footer { margin-top: 26px; text-align: center; font-family: var(--display); font
   function tick() {
     var d = new Date(), h = d.getHours();
     document.getElementById('hello').textContent =
-      h < 5 ? 'Up late?' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+      (h < 5 ? 'Up late' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening') +
+      (userName ? ', ' + userName : '') + (h < 5 ? '?' : '');
     document.getElementById('time').textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     document.getElementById('date').textContent = d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase();
   }

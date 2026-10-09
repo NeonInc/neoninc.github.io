@@ -497,7 +497,10 @@ function load() {
 }
 function save() {
   if (!S) return;
+  S.updatedAt = Date.now();
   try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (_) { storageOK = false; }
+  // Signed-in players: also save to their Neon Inc account (see /neon-cloud.js).
+  if (global.NeonCloud) global.NeonCloud.push('arcade');
 }
 function state() { return S || load(); }
 
@@ -1130,5 +1133,10 @@ global.Arcade = {
 load();
 if (global.document) {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', applyTheme); else applyTheme();
+}
+// Cloud saves: when signed in, bring this device and the account in line.
+// A newer copy from the account arrives through the 'storage' listener above.
+if (global.NeonCloud && global.NeonCloud.enabled) {
+  global.NeonCloud.onUser(u => { if (u) global.NeonCloud.sync('arcade').catch(() => {}); });
 }
 })(window);
