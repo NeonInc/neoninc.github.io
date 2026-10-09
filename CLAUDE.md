@@ -43,3 +43,12 @@ This repo serves https://neoninc.github.io/ and holds TWO things. Keep them apar
 - Testing locally: serve the site on localhost, set `localStorage['neoncloud.emulator']='1'`, run
   `firebase emulators:start --only auth --project demo-neon`, and either the Firestore emulator or a
   stand-in database exposed as `window.__neonTestFirestore`.
+
+## Google sign-in branding
+
+- `privacy.html`, `terms.html` (styled by `legal.css`) and the hub's About text and footer links are what
+  Google checks for brand verification of the sign-in screen. Keep them at these paths and keep the
+  footer links on the hub. Contact address: neoninc.support@gmail.com.
+- If the apps start collecting new kinds of personal data, update `privacy.html` (and its date).
+- `logo-120.png` is the logo uploaded to Google Auth Platform → Branding.
+- A `google*.html` file at the root proves site ownership to Google Search Console. Never delete it.
