@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#03030d">
+<meta name="description" content="Neon Arcade — retro neon games with one shared account: levels, daily quests, achievements and unlockable rewards.">
+<title>NEON ARCADE — Neon Inc™</title>
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="assets/css/arcade.css">
+<link rel="stylesheet" href="assets/css/hub.css">
+</head>
+<body class="hub">
+<canvas id="hubBg" aria-hidden="true"></canvas>
+
+<div id="app">
+  <header class="h-top">
+    <a class="h-brand" href="index.html" aria-label="Neon Arcade home">
+      <svg class="h-logo" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6 54 19v26L32 58 10 45V19z" fill="none" stroke="currentColor" stroke-width="4"/><path d="M32 18 43 24.5v13L32 44 21 37.5v-13z" fill="var(--a2)"/></svg>
+      <div><div class="h-brand-t">NEON ARCADE</div><div class="h-brand-s">NEON INC™ · v4.0</div></div>
+    </a>
+    <button class="h-player" id="playerChip" aria-label="Open profile">
+      <div class="h-av" id="hAvatar">◌</div>
+      <div class="h-pinfo">
+        <div class="h-pname"><span id="hName">PLAYER</span><span class="h-lv" id="hLevel">LV 1</span></div>
+        <div class="h-xp"><i id="hXP"></i></div>
+      </div>
+      <div class="h-shards"><span>💎</span><b id="hShards">0</b></div>
+      <div class="h-streak" id="hStreak" hidden>🔥<b>0</b></div>
+    </button>
+    <div class="h-ctrl">
+      <button class="na-icon-btn" id="musicBtn" aria-label="Toggle music" title="Music">♪</button>
+      <button class="na-icon-btn" id="settingsBtn" aria-label="Settings" title="Settings">⚙</button>
+    </div>
+  </header>
+
+  <nav class="h-tabs" role="tablist" aria-label="Arcade sections">
+    <button role="tab" data-tab="arcade" aria-selected="true"><span class="ti">🕹️</span><span>ARCADE</span></button>
+    <button role="tab" data-tab="quests"><span class="ti">📜</span><span>QUESTS</span><i class="dot" id="questDot" hidden></i></button>
+    <button role="tab" data-tab="achievements"><span class="ti">🏆</span><span>AWARDS</span></button>
+    <button role="tab" data-tab="vault"><span class="ti">💎</span><span>VAULT</span></button>
+    <button role="tab" data-tab="profile"><span class="ti">👤</span><span>PROFILE</span></button>
+  </nav>
+
+  <main class="h-main" id="main">
+    <section class="h-sec active" id="sec-arcade" role="tabpanel"></section>
+    <section class="h-sec" id="sec-quests" role="tabpanel"></section>
+    <section class="h-sec" id="sec-achievements" role="tabpanel"></section>
+    <section class="h-sec" id="sec-vault" role="tabpanel"></section>
+    <section class="h-sec" id="sec-profile" role="tabpanel"></section>
+    <footer class="h-foot">NEON ARCADE · NEON INC™ © 2026 · Progress is saved in this browser — use Profile → Save code to move it.</footer>
+  </main>
+</div>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" hidden><div class="modal-card" id="modalCard"></div></div>
+
+<script src="assets/js/arcade-core.js"></script>
+<script src="assets/js/hub.js"></script>
+</body>
+</html>

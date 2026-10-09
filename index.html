@@ -3,62 +3,378 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#03030d">
-<meta name="description" content="Neon Arcade — retro neon games with one shared account: levels, daily quests, achievements and unlockable rewards.">
-<title>NEON ARCADE — Neon Inc™</title>
-<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#04040c">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="Neon Inc — every Neon Inc app in one place: Scent Scout, Neon Arcade and Neon Gym.">
+<title>Neon Inc</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap">
-<link rel="stylesheet" href="assets/css/arcade.css">
-<link rel="stylesheet" href="assets/css/hub.css">
-</head>
-<body class="hub">
-<canvas id="hubBg" aria-hidden="true"></canvas>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap">
+<style>
+:root {
+  --bg: #04040c;
+  --panel: rgba(12, 12, 32, 0.72);
+  --line: rgba(255, 255, 255, 0.09);
+  --text: #e6f6ff;
+  --dim: rgba(230, 246, 255, 0.64);
+  --dim2: rgba(230, 246, 255, 0.40);
+  --cyan: #00f0ff;
+  --pink: #ff00ff;
+  --display: 'Orbitron', 'Segoe UI', sans-serif;
+  --body: 'Rajdhani', 'Segoe UI', sans-serif;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  min-height: 100vh; min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 17px;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+/* backdrop: perspective grid + soft glows */
+.bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.bg::before {
+  content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(60vmax 40vmax at 15% -10%, rgba(255, 0, 255, .16), transparent 60%),
+    radial-gradient(60vmax 40vmax at 100% 10%, rgba(0, 240, 255, .13), transparent 60%);
+}
+.grid {
+  position: absolute; left: -50%; right: -50%; bottom: -10%; height: 55%;
+  background-image:
+    linear-gradient(rgba(0, 240, 255, .22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, .22) 1px, transparent 1px);
+  background-size: 56px 56px;
+  transform: perspective(420px) rotateX(62deg);
+  transform-origin: 50% 0;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 45%);
+          mask-image: linear-gradient(to bottom, transparent, #000 45%);
+  animation: roll 3.2s linear infinite;
+  opacity: .55;
+}
+@keyframes roll { to { background-position: 0 56px, 0 0; } }
 
-<div id="app">
-  <header class="h-top">
-    <a class="h-brand" href="index.html" aria-label="Neon Arcade home">
-      <svg class="h-logo" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6 54 19v26L32 58 10 45V19z" fill="none" stroke="currentColor" stroke-width="4"/><path d="M32 18 43 24.5v13L32 44 21 37.5v-13z" fill="var(--a2)"/></svg>
-      <div><div class="h-brand-t">NEON ARCADE</div><div class="h-brand-s">NEON INC™ · v4.0</div></div>
-    </a>
-    <button class="h-player" id="playerChip" aria-label="Open profile">
-      <div class="h-av" id="hAvatar">◌</div>
-      <div class="h-pinfo">
-        <div class="h-pname"><span id="hName">PLAYER</span><span class="h-lv" id="hLevel">LV 1</span></div>
-        <div class="h-xp"><i id="hXP"></i></div>
-      </div>
-      <div class="h-shards"><span>💎</span><b id="hShards">0</b></div>
-      <div class="h-streak" id="hStreak" hidden>🔥<b>0</b></div>
-    </button>
-    <div class="h-ctrl">
-      <button class="na-icon-btn" id="musicBtn" aria-label="Toggle music" title="Music">♪</button>
-      <button class="na-icon-btn" id="settingsBtn" aria-label="Settings" title="Settings">⚙</button>
+.wrap {
+  position: relative; z-index: 1;
+  max-width: 980px; margin: 0 auto;
+  padding: max(28px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom));
+}
+header { display: flex; align-items: center; gap: 14px; margin: 8px 0 34px; }
+.logo { width: 46px; height: 46px; flex: none; filter: drop-shadow(0 0 10px rgba(0, 240, 255, .55)); }
+.brand { font-family: var(--display); font-weight: 900; letter-spacing: .14em; font-size: 22px; line-height: 1; }
+.brand span { color: var(--cyan); text-shadow: 0 0 14px rgba(0, 240, 255, .7); }
+.sub { font-family: var(--display); font-size: 10px; letter-spacing: .32em; color: var(--dim2); margin-top: 6px; }
+.clock { margin-left: auto; text-align: right; font-family: var(--display); }
+.clock b { display: block; font-size: 20px; font-weight: 700; letter-spacing: .06em; }
+.clock small { font-size: 10px; letter-spacing: .2em; color: var(--dim2); }
+
+h1 {
+  font-family: var(--display); font-weight: 700; font-size: clamp(24px, 5vw, 34px);
+  letter-spacing: .04em; margin: 0 0 6px;
+}
+.lede { color: var(--dim); margin: 0 0 26px; font-size: 18px; }
+
+.apps { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.app {
+  --c1: var(--cyan); --c2: var(--pink);
+  position: relative; display: flex; flex-direction: column; gap: 14px;
+  padding: 20px 20px 16px; border-radius: 20px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: inherit; text-decoration: none;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  transition: transform .25s var(--ease), border-color .25s, box-shadow .25s;
+  isolation: isolate;
+  opacity: 0; transform: translateY(12px);
+  animation: rise .5s var(--ease) forwards;
+}
+.app::before { /* gradient edge */
+  content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; z-index: -1;
+  background: linear-gradient(135deg, var(--c1), transparent 40%, transparent 60%, var(--c2));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: .55; transition: opacity .25s;
+}
+.app:hover, .app:focus-within {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 40px -12px color-mix(in srgb, var(--c1) 55%, transparent);
+  outline: none;
+}
+.app:hover::before, .app:focus-within::before { opacity: 1; }
+.cover { position: absolute; inset: 0; border-radius: inherit; z-index: 1; outline: none; }
+.cover:focus-visible { box-shadow: 0 0 0 2px var(--c1); }
+.app:active { transform: translateY(-1px) scale(.99); }
+@keyframes rise { to { opacity: 1; transform: none; } }
+
+.top { display: flex; align-items: center; gap: 14px; }
+.ico {
+  width: 60px; height: 60px; flex: none; border-radius: 16px; overflow: hidden;
+  box-shadow: 0 0 22px -4px var(--c1);
+  background: #0b0b1c;
+}
+.ico img { width: 100%; height: 100%; display: block; }
+.name { font-family: var(--display); font-weight: 700; font-size: 18px; letter-spacing: .05em; }
+.tag { color: var(--dim); font-size: 16px; line-height: 1.25; margin-top: 3px; }
+.key {
+  margin-left: auto; align-self: flex-start;
+  font-family: var(--display); font-size: 11px; color: var(--dim2);
+  border: 1px solid var(--line); border-radius: 6px; padding: 3px 7px;
+}
+@media (hover: none) { .key { display: none; } }
+
+.stat {
+  display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center;
+  font-weight: 600; font-size: 16px; min-height: 24px;
+  color: var(--text);
+}
+.stat .pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 10px; border-radius: 999px;
+  background: color-mix(in srgb, var(--c1) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--c1) 30%, transparent);
+}
+.stat .muted { color: var(--dim); font-weight: 500; }
+.foot {
+  display: flex; align-items: center; gap: 10px;
+  padding-top: 12px; border-top: 1px solid var(--line);
+  font-size: 14px; color: var(--dim2);
+}
+.foot > * { white-space: nowrap; }
+.foot .upd { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.foot .open {
+  margin-left: auto; font-family: var(--display); font-size: 11px; letter-spacing: .18em;
+  color: var(--c1);
+}
+.foot a.src { color: var(--dim2); text-decoration: none; position: relative; z-index: 2; }
+.foot a.src:hover { color: var(--text); text-decoration: underline; }
+
+.tip {
+  margin-top: 30px; padding: 14px 16px; border-radius: 14px;
+  border: 1px dashed var(--line); color: var(--dim); font-size: 16px; line-height: 1.4;
+}
+.tip b { color: var(--text); }
+footer { margin-top: 26px; text-align: center; font-family: var(--display); font-size: 10px; letter-spacing: .26em; color: var(--dim2); }
+
+@media (max-width: 520px) {
+  header { margin-bottom: 26px; }
+  .clock { display: none; }
+  .app { padding: 16px 16px 14px; }
+  .ico { width: 52px; height: 52px; border-radius: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grid { animation: none; }
+  .app { animation: none; opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"><div class="grid"></div></div>
+
+<div class="wrap">
+  <header>
+    <img class="logo" src="icon.svg" alt="">
+    <div>
+      <div class="brand">NEON <span>INC</span></div>
+      <div class="sub">APP HUB</div>
     </div>
+    <div class="clock" aria-hidden="true"><b id="time">--:--</b><small id="date"></small></div>
   </header>
 
-  <nav class="h-tabs" role="tablist" aria-label="Arcade sections">
-    <button role="tab" data-tab="arcade" aria-selected="true"><span class="ti">🕹️</span><span>ARCADE</span></button>
-    <button role="tab" data-tab="quests"><span class="ti">📜</span><span>QUESTS</span><i class="dot" id="questDot" hidden></i></button>
-    <button role="tab" data-tab="achievements"><span class="ti">🏆</span><span>AWARDS</span></button>
-    <button role="tab" data-tab="vault"><span class="ti">💎</span><span>VAULT</span></button>
-    <button role="tab" data-tab="profile"><span class="ti">👤</span><span>PROFILE</span></button>
-  </nav>
+  <h1 id="hello">Welcome back</h1>
+  <p class="lede">Everything Neon Inc, one tap away.</p>
 
-  <main class="h-main" id="main">
-    <section class="h-sec active" id="sec-arcade" role="tabpanel"></section>
-    <section class="h-sec" id="sec-quests" role="tabpanel"></section>
-    <section class="h-sec" id="sec-achievements" role="tabpanel"></section>
-    <section class="h-sec" id="sec-vault" role="tabpanel"></section>
-    <section class="h-sec" id="sec-profile" role="tabpanel"></section>
-    <footer class="h-foot">NEON ARCADE · NEON INC™ © 2026 · Progress is saved in this browser — use Profile → Save code to move it.</footer>
-  </main>
+  <main class="apps" id="apps" aria-label="Neon Inc apps"></main>
+
+  <div class="tip" id="tip">
+    <b>Keep it on your phone:</b> open this page in Chrome, tap <b>⋮ → Add to Home screen</b>.
+    On a computer, bookmark <b>neoninc.github.io</b>. That's the only address you need.
+  </div>
+
+  <footer>NEON INC™ © <span id="yr">2026</span></footer>
 </div>
 
-<div class="modal" id="modal" role="dialog" aria-modal="true" hidden><div class="modal-card" id="modalCard"></div></div>
+<script src="apps.js"></script>
+<script>
+(function () {
+  'use strict';
+  var APPS = window.NEON_APPS || [];
+  var OWNER = 'NeonInc';
 
-<script src="assets/js/arcade-core.js"></script>
-<script src="assets/js/hub.js"></script>
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function readJSON(key) {
+    try { var raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : null; } catch (e) { return null; }
+  }
+  function ago(iso) {
+    var s = (Date.now() - new Date(iso).getTime()) / 1000;
+    if (!isFinite(s)) return '';
+    if (s < 90) return 'just now';
+    var m = s / 60; if (m < 60) return Math.round(m) + ' min ago';
+    var h = m / 60; if (h < 36) return Math.round(h) + 'h ago';
+    var d = h / 24; if (d < 30) return Math.round(d) + ' days ago';
+    return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+  }
+
+  /* Each app's own saved data lives on this same site, so the hub can read it
+     (read-only) and show a quick status. If an app changes how it saves,
+     the tile just falls back to "Open" and nothing breaks. */
+  var STATS = {
+    arcade: function () {
+      var s = readJSON('neonArcade_v3');
+      if (!s || typeof s.level !== 'number') return [{ muted: 'No saves on this device yet' }];
+      var out = [{ pill: 'LV ' + s.level }];
+      if (s.shards) out.push({ pill: '💎 ' + s.shards });
+      if (s.streak > 1) out.push({ pill: '🔥 ' + s.streak + '-day streak' });
+      return out;
+    },
+    gym: function () {
+      var s = readJSON('menlyn-log-v2');
+      var sess = s && s.sessions;
+      if (!sess || typeof sess !== 'object') return [{ muted: 'Start your first workout' }];
+      function done(x) {
+        if (!x) return false;
+        if (x.done && Object.keys(x.done).some(function (k) { return x.done[k]; })) return true;
+        return Object.keys(x.sets || {}).some(function (k) {
+          return Array.isArray(x.sets[k]) && x.sets[k].some(function (r) { return r && r.d; });
+        });
+      }
+      var dates = Object.keys(sess).map(function (k) { return sess[k]; })
+        .filter(function (x) { return done(x) && /^\d{4}-\d{2}-\d{2}$/.test(x.date || ''); })
+        .map(function (x) { return x.date; }).sort();
+      if (!dates.length) return [{ muted: 'Start your first workout' }];
+      var now = new Date(); now.setHours(0, 0, 0, 0);
+      var monday = new Date(now); monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+      var week = dates.filter(function (d) {
+        var p = d.split('-'); return new Date(+p[0], p[1] - 1, +p[2]) >= monday;
+      }).length;
+      var last = dates[dates.length - 1].split('-');
+      var lastD = new Date(+last[0], last[1] - 1, +last[2]);
+      var days = Math.round((now - lastD) / 864e5);
+      var lastTxt = days === 0 ? 'today' : days === 1 ? 'yesterday' : days < 7
+        ? lastD.toLocaleDateString(undefined, { weekday: 'long' }) : days + ' days ago';
+      return [{ pill: '🏋️ ' + week + ' this week' }, { muted: 'Last workout ' + lastTxt }];
+    },
+    scent: function () {
+      var w = readJSON('scentscout.watch2');
+      var n = Array.isArray(w) ? w.filter(function (x) { return x && x.gk; }).length : 0;
+      if (!n) return [{ muted: 'Search any fragrance' }];
+      return [{ pill: '👁 ' + n + ' on your watchlist' }];
+    }
+  };
+
+  /* "Updated …" times come from GitHub's public API, cached for 15 minutes.
+     If GitHub can't be reached the line simply stays empty. */
+  var CACHE_KEY = 'neonhub.updated';
+  function loadUpdated(cb) {
+    var cached = null;
+    try { cached = JSON.parse(sessionStorage.getItem(CACHE_KEY)); } catch (e) {}
+    if (cached && Date.now() - cached.at < 15 * 60 * 1000) { cb(cached.data); return; }
+    if (!window.fetch) return;
+    fetch('https://api.github.com/users/' + OWNER + '/repos?per_page=100&sort=pushed', { headers: { Accept: 'application/vnd.github+json' } })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (list) {
+        if (!Array.isArray(list)) return;
+        var data = {};
+        list.forEach(function (r) { data[r.name] = r.pushed_at; });
+        try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), data: data })); } catch (e) {}
+        cb(data);
+      })
+      .catch(function () {});
+  }
+
+  var root = document.getElementById('apps');
+  var isTouch = window.matchMedia && matchMedia('(hover: none)').matches;
+  var updatedEls = {};
+
+  APPS.forEach(function (app, i) {
+    var a = el('div', 'app');
+    var cover = el('a', 'cover');
+    cover.href = app.url;
+    cover.setAttribute('aria-label', 'Open ' + app.name);
+    a.appendChild(cover);
+    a.style.setProperty('--c1', (app.color && app.color[0]) || '#00f0ff');
+    a.style.setProperty('--c2', (app.color && app.color[1]) || '#ff00ff');
+    a.style.animationDelay = (i * 70) + 'ms';
+
+    var top = el('div', 'top');
+    var ico = el('div', 'ico');
+    var img = el('img'); img.src = app.icon; img.alt = ''; img.loading = 'lazy';
+    img.onerror = function () { ico.textContent = ''; ico.style.background = 'linear-gradient(135deg,' + a.style.getPropertyValue('--c1') + ',' + a.style.getPropertyValue('--c2') + ')'; };
+    ico.appendChild(img);
+    var txt = el('div');
+    txt.appendChild(el('div', 'name', app.name));
+    txt.appendChild(el('div', 'tag', app.tagline || ''));
+    top.appendChild(ico); top.appendChild(txt);
+    if (i < 9 && !isTouch) top.appendChild(el('span', 'key', String(i + 1)));
+    a.appendChild(top);
+
+    var stat = el('div', 'stat');
+    var lines = [];
+    try { lines = STATS[app.id] ? STATS[app.id]() : []; } catch (e) { lines = []; }
+    lines.forEach(function (l) {
+      if (l.pill) stat.appendChild(el('span', 'pill', l.pill));
+      else if (l.muted) stat.appendChild(el('span', 'muted', l.muted));
+    });
+    if (lines.length) a.appendChild(stat);
+
+    var foot = el('div', 'foot');
+    var upd = el('span', 'upd', '');
+    updatedEls[app.repo] = updatedEls[app.repo] || [];
+    updatedEls[app.repo].push({ el: upd, label: app.updated || 'Updated' });
+    foot.appendChild(upd);
+    if (app.repo) {
+      var src = el('a', 'src', 'GitHub');
+      src.href = 'https://github.com/' + OWNER + '/' + app.repo;
+      src.target = '_blank'; src.rel = 'noopener';
+      foot.appendChild(src);
+    }
+    foot.appendChild(el('span', 'open', 'OPEN →'));
+    a.appendChild(foot);
+
+    root.appendChild(a);
+  });
+
+  loadUpdated(function (data) {
+    Object.keys(updatedEls).forEach(function (repo) {
+      if (!data[repo]) return;
+      updatedEls[repo].forEach(function (u) { u.el.textContent = u.label + ' ' + ago(data[repo]); });
+    });
+  });
+
+  // number keys 1–9 open an app
+  document.addEventListener('keydown', function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var n = parseInt(e.key, 10);
+    if (n >= 1 && n <= APPS.length) location.href = APPS[n - 1].url;
+  });
+
+  // greeting + clock
+  function tick() {
+    var d = new Date(), h = d.getHours();
+    document.getElementById('hello').textContent =
+      h < 5 ? 'Up late?' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+    document.getElementById('time').textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('date').textContent = d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase();
+  }
+  tick(); setInterval(tick, 15000);
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // hide the home-screen tip once the hub is running as an installed app
+  if ((window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone) {
+    document.getElementById('tip').hidden = true;
+  }
+})();
+</script>
 </body>
 </html>
