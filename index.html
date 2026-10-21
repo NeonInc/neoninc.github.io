@@ -3,193 +3,259 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#04040c">
+<meta name="theme-color" content="#0c0e12">
 <meta name="color-scheme" content="dark">
-<meta name="description" content="Neon Inc — every Neon Inc app in one place: Scent Scout, Neon Arcade and Neon Gym.">
+<meta name="description" content="Neon Inc: every Neon Inc app in one place. Neon Gym, Scent Scout and Neon Arcade.">
 <title>Neon Inc</title>
-<link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon.svg?v=2" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap">
 <style>
+/* Neon Inc hub · same family look as Neon Gym: graphite background, cyan for actions,
+   magenta only in glows and progress. Neon Gym is the big featured card. */
 :root {
-  --bg: #04040c;
-  --panel: rgba(12, 12, 32, 0.72);
-  --line: rgba(255, 255, 255, 0.09);
-  --text: #e6f6ff;
-  --dim: rgba(230, 246, 255, 0.64);
-  --dim2: rgba(230, 246, 255, 0.40);
-  --cyan: #00f0ff;
-  --pink: #ff00ff;
-  --display: 'Orbitron', 'Segoe UI', sans-serif;
-  --body: 'Rajdhani', 'Segoe UI', sans-serif;
+  --bg: #0c0e12;
+  --bg-glow: #1d222b;
+  --surface: rgba(30, 34, 41, .72);
+  --surface-2: #272c35;
+  --line: rgba(255, 255, 255, .08);
+  --line-2: rgba(255, 255, 255, .14);
+  --ink: #edf1f6;
+  --muted: #9ba3b0;
+  --dim: #6b7380;
+  --cyan: #00e5f4;
+  --magenta: #ff2bd6;
+  --amber: #ffb547;
+  --good: #3dffa2;
+  --brand: 'Orbitron', 'Arial Black', sans-serif;
+  --display: 'Rajdhani', 'Arial Narrow', sans-serif;
+  --body: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --ease: cubic-bezier(.2, .8, .2, 1);
+  color-scheme: dark;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; }
 body {
   min-height: 100vh; min-height: 100dvh;
   background: var(--bg);
-  color: var(--text);
+  color: var(--ink);
   font-family: var(--body);
-  font-size: 17px;
+  font-size: 16px; line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
-/* backdrop: perspective grid + soft glows */
-.bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-.bg::before {
-  content: ""; position: absolute; inset: 0;
-  background:
-    radial-gradient(60vmax 40vmax at 15% -10%, rgba(255, 0, 255, .16), transparent 60%),
-    radial-gradient(60vmax 40vmax at 100% 10%, rgba(0, 240, 255, .13), transparent 60%);
-}
-.grid {
-  position: absolute; left: -50%; right: -50%; bottom: -10%; height: 55%;
-  background-image:
-    linear-gradient(rgba(0, 240, 255, .22) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 240, 255, .22) 1px, transparent 1px);
-  background-size: 56px 56px;
-  transform: perspective(420px) rotateX(62deg);
-  transform-origin: 50% 0;
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 45%);
-          mask-image: linear-gradient(to bottom, transparent, #000 45%);
-  animation: roll 3.2s linear infinite;
-  opacity: .55;
-}
-@keyframes roll { to { background-position: 0 56px, 0 0; } }
+[hidden] { display: none !important; }
+
+/* ── backdrop: graphite glow, two slow aurora lights, fine dot grid ── */
+.bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+  background: radial-gradient(120% 70% at 50% -15%, var(--bg-glow) 0%, var(--bg) 62%); }
+.bg i { position: absolute; border-radius: 50%; filter: blur(80px); opacity: .5; will-change: transform; }
+.bg .a1 { width: 52vmax; height: 52vmax; left: -18vmax; top: -22vmax; background: radial-gradient(circle, rgba(0, 229, 244, .38), transparent 65%); animation: drift1 26s ease-in-out infinite alternate; }
+.bg .a2 { width: 46vmax; height: 46vmax; right: -20vmax; top: 6vmax; background: radial-gradient(circle, rgba(255, 43, 214, .30), transparent 65%); animation: drift2 32s ease-in-out infinite alternate; }
+.bg .dots { position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, .07) 1px, transparent 1.2px);
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(90% 60% at 50% 0%, #000 20%, transparent 75%);
+          mask-image: radial-gradient(90% 60% at 50% 0%, #000 20%, transparent 75%); }
+@keyframes drift1 { to { transform: translate(10vmax, 8vmax) scale(1.1); } }
+@keyframes drift2 { to { transform: translate(-12vmax, 10vmax) scale(.92); } }
 
 .wrap {
   position: relative; z-index: 1;
-  max-width: 980px; margin: 0 auto;
-  padding: max(28px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom));
+  max-width: 960px; margin: 0 auto;
+  padding: max(22px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom));
 }
-header { display: flex; align-items: center; gap: 14px; margin: 8px 0 34px; }
-.logo { width: 46px; height: 46px; flex: none; filter: drop-shadow(0 0 10px rgba(0, 240, 255, .55)); }
-.brand { font-family: var(--display); font-weight: 900; letter-spacing: .14em; font-size: 22px; line-height: 1; }
-.brand span { color: var(--cyan); text-shadow: 0 0 14px rgba(0, 240, 255, .7); }
-.sub { font-family: var(--display); font-size: 10px; letter-spacing: .32em; color: var(--dim2); margin-top: 6px; }
+
+/* ── header ── */
+header { display: flex; align-items: center; gap: 12px; margin: 6px 0 30px; }
+.logo { width: 44px; height: 44px; flex: none; border-radius: 11px; box-shadow: 0 0 24px -6px rgba(0, 229, 244, .6), 0 0 0 1px var(--line); }
+.brand { font-family: var(--brand); font-weight: 900; letter-spacing: .14em; font-size: 19px; line-height: 1; }
+.brand span { background: linear-gradient(90deg, var(--cyan), var(--magenta)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.sub { font-size: 10.5px; letter-spacing: .24em; color: var(--muted); margin-top: 6px; font-weight: 700; }
 .acct { margin-left: auto; }
-.clock { margin-left: 18px; text-align: right; font-family: var(--display); }
-.stat:empty { display: none; }
-.cloud-note { color: var(--dim); font-size: 15px; margin: -14px 0 22px; }
-.cloud-note[hidden] { display: none; }
-.clock b { display: block; font-size: 20px; font-weight: 700; letter-spacing: .06em; }
-.clock small { font-size: 10px; letter-spacing: .2em; color: var(--dim2); }
+.clock { margin-left: 14px; text-align: right; }
+.clock b { display: block; font-family: var(--display); font-size: 24px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.clock small { font-size: 10px; letter-spacing: .18em; color: var(--muted); font-weight: 700; }
 
-h1 {
-  font-family: var(--display); font-weight: 700; font-size: clamp(24px, 5vw, 34px);
-  letter-spacing: .04em; margin: 0 0 6px;
-}
-.lede { color: var(--dim); margin: 0 0 26px; font-size: 18px; }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(30px, 6vw, 42px); line-height: 1.05; letter-spacing: .01em; margin: 0; }
+.lede { color: var(--muted); margin: 6px 0 20px; font-size: 16px; }
+.cloud-note { color: var(--muted); font-size: 14px; margin: -8px 0 18px; }
+.label { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin: 0; }
 
-.apps { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
-.app {
-  --c1: var(--cyan); --c2: var(--pink);
-  position: relative; display: flex; flex-direction: column; gap: 14px;
-  padding: 20px 20px 16px; border-radius: 20px;
-  background: var(--panel);
+/* ── shared card shell ── */
+.card {
+  --c1: var(--cyan); --c2: var(--magenta);
+  position: relative; isolation: isolate;
+  border-radius: 22px;
+  background: var(--surface);
   border: 1px solid var(--line);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
   color: inherit; text-decoration: none;
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  transition: transform .25s var(--ease), border-color .25s, box-shadow .25s;
-  isolation: isolate;
-  opacity: 0; transform: translateY(12px);
-  animation: rise .5s var(--ease) forwards;
+  transition: transform .25s var(--ease), box-shadow .25s, border-color .25s;
+  opacity: 0; transform: translateY(10px); animation: rise .5s var(--ease) forwards;
 }
-.app::before { /* gradient edge */
+.card::before { /* gradient edge */
   content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; z-index: -1;
-  background: linear-gradient(135deg, var(--c1), transparent 40%, transparent 60%, var(--c2));
+  background: linear-gradient(135deg, var(--c1), transparent 38%, transparent 62%, var(--c2));
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor; mask-composite: exclude;
-  opacity: .55; transition: opacity .25s;
+  opacity: .5; transition: opacity .25s;
 }
-.app:hover, .app:focus-within {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 40px -12px color-mix(in srgb, var(--c1) 55%, transparent);
-  outline: none;
-}
-.app:hover::before, .app:focus-within::before { opacity: 1; }
+.card:hover, .card:focus-within { transform: translateY(-3px); box-shadow: 0 18px 50px -18px color-mix(in srgb, var(--c1) 60%, transparent); }
+.card:hover::before, .card:focus-within::before { opacity: 1; }
+.card:active { transform: translateY(-1px) scale(.995); }
 .cover { position: absolute; inset: 0; border-radius: inherit; z-index: 1; outline: none; }
 .cover:focus-visible { box-shadow: 0 0 0 2px var(--c1); }
-.app:active { transform: translateY(-1px) scale(.99); }
 @keyframes rise { to { opacity: 1; transform: none; } }
 
-.top { display: flex; align-items: center; gap: 14px; }
-.ico {
-  width: 60px; height: 60px; flex: none; border-radius: 16px; overflow: hidden;
-  box-shadow: 0 0 22px -4px var(--c1);
-  background: #0b0b1c;
-}
+.ico { flex: none; border-radius: 16px; overflow: hidden; background: #0b0d11; box-shadow: 0 0 22px -6px var(--c1), 0 0 0 1px var(--line); }
 .ico img { width: 100%; height: 100%; display: block; }
-.name { font-family: var(--display); font-weight: 700; font-size: 18px; letter-spacing: .05em; }
-.tag { color: var(--dim); font-size: 16px; line-height: 1.25; margin-top: 3px; }
-.key {
-  margin-left: auto; align-self: flex-start;
-  font-family: var(--display); font-size: 11px; color: var(--dim2);
-  border: 1px solid var(--line); border-radius: 6px; padding: 3px 7px;
-}
+.name { font-family: var(--display); font-weight: 700; font-size: 22px; line-height: 1.1; }
+.tag { color: var(--muted); font-size: 14px; line-height: 1.3; margin-top: 2px; }
+.key { font-family: var(--display); font-weight: 700; font-size: 12px; color: var(--dim); border: 1px solid var(--line-2); border-radius: 6px; padding: 1px 7px; }
 @media (hover: none) { .key { display: none; } }
 
-.stat {
-  display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center;
-  font-weight: 600; font-size: 16px; min-height: 24px;
-  color: var(--text);
+/* ── featured card (Neon Gym) ── */
+.hero { padding: 22px; margin-bottom: 26px; overflow: hidden; }
+.hero::after { /* soft light in the corner */
+  content: ""; position: absolute; z-index: -1; right: -120px; top: -140px; width: 360px; height: 360px; border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--c2) 22%, transparent), transparent 70%); pointer-events: none;
 }
-.stat .pill {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 3px 10px; border-radius: 999px;
-  background: color-mix(in srgb, var(--c1) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--c1) 30%, transparent);
+.h-top { display: flex; align-items: center; gap: 14px; }
+.h-top .ico { width: 56px; height: 56px; }
+.h-top .name { font-size: 26px; }
+.h-top .right { margin-left: auto; display: flex; align-items: center; gap: 8px; align-self: flex-start; }
+.chip { font-size: 12px; font-weight: 700; color: var(--cyan); border: 1px solid rgba(0, 229, 244, .35); background: rgba(0, 229, 244, .08); border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
+
+.h-main { display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: center; margin-top: 22px; }
+
+/* week ring */
+.ring { position: relative; width: 128px; height: 128px; flex: none; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
+.ring .track { stroke: var(--surface-2); }
+.ring .val { transition: stroke-dashoffset 1s var(--ease); filter: drop-shadow(0 0 6px rgba(255, 43, 214, .55)); }
+.ring .mid { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ring .num { font-family: var(--display); font-weight: 700; font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums; }
+.ring .num small { font-size: 22px; color: var(--muted); }
+.ring .lbl { font-size: 10px; letter-spacing: .16em; color: var(--muted); font-weight: 700; margin-top: 4px; }
+.ring.full .num { color: var(--good); }
+
+/* streak */
+.streak { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.flame { width: 54px; height: 64px; flex: none; }
+.flame.on { filter: drop-shadow(0 0 14px rgba(255, 43, 214, .6)); animation: flick 2.4s ease-in-out infinite; transform-origin: 50% 90%; }
+.flame:not(.on) path { fill: var(--surface-2); }
+@keyframes flick { 0%, 100% { transform: scale(1) rotate(0); } 30% { transform: scale(1.04, .97) rotate(-1.5deg); } 60% { transform: scale(.98, 1.03) rotate(1deg); } }
+.s-num { font-family: var(--display); font-weight: 700; font-size: 58px; line-height: .9; font-variant-numeric: tabular-nums;
+  background: linear-gradient(180deg, #fff, #c9d3e0); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.s-num.on { background: linear-gradient(100deg, var(--amber), var(--magenta)); -webkit-background-clip: text; background-clip: text; }
+.s-lbl { font-family: var(--display); font-weight: 700; font-size: 18px; letter-spacing: .06em; text-transform: uppercase; margin-top: 2px; }
+.s-msg { color: var(--muted); font-size: 14px; line-height: 1.35; margin-top: 4px; }
+.s-msg b { color: var(--ink); font-weight: 600; }
+
+/* this week: Mon–Sun */
+.days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 22px; }
+.day { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.day span { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--dim); }
+.day i {
+  width: 100%; max-width: 46px; aspect-ratio: 1; border-radius: 12px; display: grid; place-items: center;
+  background: rgba(255, 255, 255, .03); border: 1px solid var(--line); font-style: normal; font-weight: 800; color: transparent; font-size: 16px;
 }
-.stat .muted { color: var(--dim); font-weight: 500; }
-.foot {
-  display: flex; align-items: center; gap: 10px;
-  padding-top: 12px; border-top: 1px solid var(--line);
-  font-size: 14px; color: var(--dim2);
+.day.past i { background: rgba(255, 255, 255, .02); }
+.day.today span { color: var(--cyan); }
+.day.today i { border-color: rgba(0, 229, 244, .6); box-shadow: inset 0 0 0 1px rgba(0, 229, 244, .25); }
+.day.done span { color: var(--ink); }
+.day.done i { background: linear-gradient(135deg, var(--cyan), var(--magenta)); border-color: transparent; color: #071016; box-shadow: 0 0 16px -2px rgba(255, 43, 214, .5); }
+
+/* last 12 weeks */
+.hist { display: flex; align-items: flex-end; gap: 16px; margin-top: 20px; }
+.h12 { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.bars { display: flex; gap: 5px; align-items: flex-end; height: 46px; }
+.bars i { flex: 1; display: block; border-radius: 4px; min-height: 4px; background: var(--surface-2); }
+.bars i.met { background: linear-gradient(180deg, var(--magenta), var(--cyan)); box-shadow: 0 0 10px -2px rgba(0, 229, 244, .5); }
+.bars i.part { background: rgba(0, 229, 244, .35); }
+.bars i.now { outline: 1px dashed rgba(255, 255, 255, .25); outline-offset: 2px; }
+.totals { display: flex; gap: 18px; flex: none; }
+.tot b { display: block; font-family: var(--display); font-size: 26px; line-height: 1; font-variant-numeric: tabular-nums; }
+.tot span { font-size: 10px; letter-spacing: .14em; color: var(--muted); font-weight: 700; text-transform: uppercase; }
+
+.h-foot { display: flex; align-items: center; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
+.h-foot .last { color: var(--muted); font-size: 14px; min-width: 0; }
+.cta {
+  margin-left: auto; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+  font-weight: 700; font-size: 15px; color: #041318; padding: 11px 18px; border-radius: 12px;
+  background: linear-gradient(90deg, var(--cyan), #7ef3ff); box-shadow: 0 6px 24px -8px rgba(0, 229, 244, .8);
+  transition: transform .2s var(--ease);
 }
+.hero:hover .cta { transform: translateX(3px); }
+
+/* ── other apps ── */
+.more { display: flex; align-items: baseline; justify-content: space-between; margin: 0 2px 12px; }
+.apps { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.app { display: flex; flex-direction: column; gap: 12px; padding: 18px 18px 14px; }
+.app .top { display: flex; align-items: center; gap: 14px; }
+.app .ico { width: 52px; height: 52px; border-radius: 14px; }
+.app .key { margin-left: auto; align-self: flex-start; }
+.stat { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; font-weight: 600; font-size: 14px; min-height: 24px; }
+.stat:empty { display: none; }
+.stat .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px;
+  background: color-mix(in srgb, var(--c1) 12%, transparent); border: 1px solid color-mix(in srgb, var(--c1) 30%, transparent); }
+.stat .muted { color: var(--muted); font-weight: 500; }
+.foot { display: flex; align-items: center; gap: 10px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; color: var(--dim); }
 .foot > * { white-space: nowrap; }
 .foot .upd { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-.foot .open {
-  margin-left: auto; font-family: var(--display); font-size: 11px; letter-spacing: .18em;
-  color: var(--c1);
-}
-.foot a.src { color: var(--dim2); text-decoration: none; position: relative; z-index: 2; }
-.foot a.src:hover { color: var(--text); text-decoration: underline; }
+.foot .open { margin-left: auto; font-weight: 700; color: var(--c1); }
+a.src { color: var(--dim); text-decoration: none; position: relative; z-index: 2; font-size: 13px; }
+a.src:hover { color: var(--ink); text-decoration: underline; }
 
-.tip {
-  margin-top: 30px; padding: 14px 16px; border-radius: 14px;
-  border: 1px dashed var(--line); color: var(--dim); font-size: 16px; line-height: 1.4;
-}
-.tip b { color: var(--text); }
-.about { margin-top: 22px; color: var(--dim); font-size: 16px; line-height: 1.45; }
+.tip { margin-top: 26px; padding: 14px 16px; border-radius: 14px; border: 1px dashed var(--line-2); color: var(--muted); font-size: 15px; line-height: 1.45; }
+.tip b { color: var(--ink); font-weight: 600; }
+.about { margin-top: 20px; color: var(--muted); font-size: 15px; line-height: 1.55; }
 .about p { margin: 0; }
-.about b { color: var(--text); font-weight: 600; }
-footer { margin-top: 26px; display: flex; flex-direction: column; align-items: center; gap: 10px; font-family: var(--display); font-size: 10px; letter-spacing: .26em; color: var(--dim2); }
-footer .legal { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; font-family: var(--body); font-size: 15px; letter-spacing: 0; }
-footer .legal a { color: var(--dim); text-decoration: none; }
-footer .legal a:hover { color: var(--text); text-decoration: underline; }
+.about b { color: var(--ink); font-weight: 600; }
+footer { margin-top: 26px; display: flex; flex-direction: column; align-items: center; gap: 10px; font-family: var(--brand); font-size: 10px; letter-spacing: .26em; color: var(--dim); }
+footer .legal { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; font-family: var(--body); font-size: 14px; letter-spacing: 0; }
+footer .legal a { color: var(--muted); text-decoration: none; }
+footer .legal a:hover { color: var(--ink); text-decoration: underline; }
 
-@media (max-width: 520px) {
-  header { margin-bottom: 26px; flex-wrap: wrap; }
+@media (max-width: 560px) {
+  header { margin-bottom: 24px; }
   .clock { display: none; }
-  .app { padding: 16px 16px 14px; }
-  .ico { width: 52px; height: 52px; border-radius: 14px; }
+  .hero { padding: 18px 16px; border-radius: 20px; }
+  .h-top .ico { width: 48px; height: 48px; border-radius: 14px; }
+  .h-top .name { font-size: 23px; }
+  .h-top .tag, .key { display: none; }
+  .h-main { gap: 16px; margin-top: 18px; }
+  .ring { width: 108px; height: 108px; }
+  .ring .num { font-size: 34px; }
+  .flame { width: 40px; height: 48px; }
+  .streak { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .s-num { font-size: 50px; }
+  .s-lbl { font-size: 16px; }
+  .days { gap: 5px; }
+  .day i { border-radius: 10px; }
+  .hist { flex-direction: column; align-items: stretch; gap: 14px; }
+  .totals { justify-content: space-between; }
+  .h-foot { flex-wrap: wrap; }
+  .cta { margin-left: 0; width: 100%; justify-content: center; order: -1; }
+  .app { padding: 16px 16px 13px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .grid { animation: none; }
-  .app { animation: none; opacity: 1; transform: none; }
+  .bg i, .flame.on { animation: none; }
+  .card { animation: none; opacity: 1; transform: none; }
+  .ring .val { transition: none; }
 }
 </style>
 </head>
 <body>
-<div class="bg" aria-hidden="true"><div class="grid"></div></div>
+<div class="bg" aria-hidden="true"><i class="a1"></i><i class="a2"></i><div class="dots"></div></div>
 
 <div class="wrap">
   <header>
-    <img class="logo" src="icon.svg" alt="">
+    <img class="logo" src="icon.svg?v=2" alt="">
     <div>
       <div class="brand">NEON <span>INC</span></div>
       <div class="sub">APP HUB</div>
@@ -202,18 +268,22 @@ footer .legal a:hover { color: var(--text); text-decoration: underline; }
   <p class="lede">Everything Neon Inc, one tap away.</p>
   <p class="cloud-note" id="cloudNote" hidden>Sign in with Google to keep your progress safe and see it on any device.</p>
 
+  <div id="featured"></div>
+
+  <div class="more" id="moreHead"><p class="label">More from Neon Inc</p></div>
   <main class="apps" id="apps" aria-label="Neon Inc apps"></main>
 
   <div class="tip" id="tip">
-    <b>Keep it on your phone:</b> open this page in Chrome, tap <b>⋮ → Add to Home screen</b>.
+    <b>Keep it on your phone:</b> on Android, open this page in Chrome and tap <b>⋮ → Install app</b>.
+    On iPhone, open it in Safari and tap <b>Share → Add to Home Screen</b>.
     On a computer, bookmark <b>neoninc.github.io</b>. That's the only address you need.
   </div>
 
   <section class="about" aria-label="About Neon Inc">
-    <p><b>Neon Inc</b> makes free apps that run in your browser. <b>Scent Scout</b> finds the cheapest price for a fragrance across
-    South African stores, delivery included. <b>Neon Arcade</b> is a collection of retro neon games with one shared player profile.
-    <b>Neon Gym</b> is a beginner gym plan, training log and food counter. Sign in with Google to keep your progress on any device,
-    or use the apps without an account.</p>
+    <p><b>Neon Inc</b> makes free apps that run in your browser. <b>Neon Gym</b> is a beginner gym plan, training log and food counter.
+    <b>Scent Scout</b> finds the cheapest price for a fragrance across South African stores, delivery included.
+    <b>Neon Arcade</b> is a collection of retro neon games with one shared player profile.
+    Sign in with Google to keep your progress on any device, or use the apps without an account.</p>
   </section>
 
   <footer>
@@ -233,6 +303,7 @@ footer .legal a:hover { color: var(--text); text-decoration: underline; }
   'use strict';
   var APPS = window.NEON_APPS || [];
   var OWNER = 'NeonInc';
+  var NS = 'http://www.w3.org/2000/svg';
 
   function el(tag, cls, text) {
     var e = document.createElement(tag);
@@ -240,6 +311,12 @@ footer .legal a:hover { color: var(--text); text-decoration: underline; }
     if (text != null) e.textContent = text;
     return e;
   }
+  function svgEl(tag, attrs) {
+    var e = document.createElementNS(NS, tag);
+    Object.keys(attrs || {}).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+    return e;
+  }
+  // Read-only: the hub never writes to any app's saved data.
   function readJSON(key) {
     try { var raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : null; } catch (e) { return null; }
   }
@@ -252,9 +329,87 @@ footer .legal a:hover { color: var(--text); text-decoration: underline; }
     var d = h / 24; if (d < 30) return Math.round(d) + ' days ago';
     return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
   }
+  function ymd(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+  function parseDay(s) { var p = s.split('-'); return new Date(+p[0], p[1] - 1, +p[2]); }
+  function mondayOf(d) { var m = new Date(d); m.setHours(0, 0, 0, 0); m.setDate(m.getDate() - ((m.getDay() + 6) % 7)); return m; }
+  function weeksBetween(a, b) { return Math.round((mondayOf(b) - mondayOf(a)) / (7 * 864e5)); }
 
-  /* Each app's own saved data lives on this same site, so the hub can read it
-     (read-only) and show a quick status. If an app changes how it saves,
+  /* ── Neon Gym summary ─────────────────────────────────────────────
+     Reads Neon Gym's save 'menlyn-log-v2' (sessions[*].date, .done, .sets and
+     profile.plan) read-only. Before Neon Gym has been opened on this device,
+     a signed-in person's workouts come from their account instead (gymCloud).
+     The streak is counted in WEEKS: a week counts when the plan's workouts for
+     that week are all done (rest days are part of the plan, so a daily streak
+     would break on every rest day). The current week only adds to the streak
+     once it's complete, and never breaks it while it's still running. */
+  var PLAN_TARGET = { fb: 3, ul: 4, ppl: 3, pair: 4 }; // = PLANS[*].perWeek in Neon Gym
+  var PLAN_NAME = { fb: 'Full Body', ul: 'Upper / Lower', ppl: 'Push / Pull / Legs', pair: 'Body-part pairs' };
+  var gymCloud = null, gymCloudProfile = null;
+
+  function gymSummary() {
+    var s = readJSON('menlyn-log-v2');
+    var local = s && s.sessions && Object.keys(s.sessions).length;
+    var sess = local ? s.sessions : gymCloud;
+    var profile = (s && s.profile) || gymCloudProfile || {};
+    var plan = PLAN_TARGET[profile.plan] ? profile.plan : null;
+    var target = plan ? PLAN_TARGET[plan] : 3;
+    function done(x) {
+      if (!x) return false;
+      if (x.done && Object.keys(x.done).some(function (k) { return x.done[k]; })) return true;
+      return Object.keys(x.sets || {}).some(function (k) {
+        return Array.isArray(x.sets[k]) && x.sets[k].some(function (r) { return r && r.d; });
+      });
+    }
+    var days = {};
+    if (sess && typeof sess === 'object') {
+      Object.keys(sess).forEach(function (k) {
+        var x = sess[k];
+        if (done(x) && /^\d{4}-\d{2}-\d{2}$/.test(x.date || '')) days[x.date] = (days[x.date] || 0) + 1;
+      });
+    }
+    var dates = Object.keys(days).sort();
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var perWeek = {}; // weeks ago -> workouts
+    dates.forEach(function (d) {
+      var w = weeksBetween(parseDay(d), today);
+      if (w >= 0) perWeek[w] = (perWeek[w] || 0) + days[d];
+    });
+    var thisWeek = perWeek[0] || 0;
+    var streak = 0, w = thisWeek >= target ? 0 : 1;
+    while ((perWeek[w] || 0) >= target) { streak++; w++; }
+    var best = 0, run = 0;
+    if (dates.length) {
+      var oldest = weeksBetween(parseDay(dates[0]), today);
+      for (var i = oldest; i >= 0; i--) {
+        if ((perWeek[i] || 0) >= target) { run++; if (run > best) best = run; }
+        else if (i > 0) run = 0;
+      }
+    }
+    var total = 0; Object.keys(days).forEach(function (d) { total += days[d]; });
+    var mon = mondayOf(today), week = [];
+    for (var j = 0; j < 7; j++) {
+      var dd = new Date(mon); dd.setDate(mon.getDate() + j);
+      var key = ymd(dd);
+      week.push({ label: dd.toLocaleDateString(undefined, { weekday: 'short' }).slice(0, 2), done: !!days[key], today: key === ymd(today), past: dd < today });
+    }
+    var hist = [];
+    for (var h = 11; h >= 0; h--) hist.push(perWeek[h] || 0);
+    var lastTxt = '';
+    if (dates.length) {
+      var lastD = parseDay(dates[dates.length - 1]);
+      var n = Math.round((today - lastD) / 864e5);
+      lastTxt = n === 0 ? 'today' : n === 1 ? 'yesterday' : n < 7
+        ? lastD.toLocaleDateString(undefined, { weekday: 'long' }) : n + ' days ago';
+    }
+    return {
+      any: dates.length > 0, plan: plan, target: target, thisWeek: thisWeek, streak: streak, best: best,
+      total: total, week: week, hist: hist, lastTxt: lastTxt,
+      daysLeft: 7 - ((today.getDay() + 6) % 7) // including today
+    };
+  }
+
+  /* Small status line for the compact tiles. Each app's saved data lives on this
+     same site, so the hub can read it (read-only). If an app changes how it saves,
      the tile just falls back to "Open" and nothing breaks. */
   var STATS = {
     arcade: function () {
@@ -266,31 +421,11 @@ footer .legal a:hover { color: var(--text); text-decoration: underline; }
       return out;
     },
     gym: function () {
-      var s = readJSON('menlyn-log-v2');
-      var sess = (s && s.sessions && Object.keys(s.sessions).length) ? s.sessions : gymCloud;
-      if (!sess || typeof sess !== 'object') return [{ muted: 'Start your first workout' }];
-      function done(x) {
-        if (!x) return false;
-        if (x.done && Object.keys(x.done).some(function (k) { return x.done[k]; })) return true;
-        return Object.keys(x.sets || {}).some(function (k) {
-          return Array.isArray(x.sets[k]) && x.sets[k].some(function (r) { return r && r.d; });
-        });
-      }
-      var dates = Object.keys(sess).map(function (k) { return sess[k]; })
-        .filter(function (x) { return done(x) && /^\d{4}-\d{2}-\d{2}$/.test(x.date || ''); })
-        .map(function (x) { return x.date; }).sort();
-      if (!dates.length) return [{ muted: 'Start your first workout' }];
-      var now = new Date(); now.setHours(0, 0, 0, 0);
-      var monday = new Date(now); monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
-      var week = dates.filter(function (d) {
-        var p = d.split('-'); return new Date(+p[0], p[1] - 1, +p[2]) >= monday;
-      }).length;
-      var last = dates[dates.length - 1].split('-');
-      var lastD = new Date(+last[0], last[1] - 1, +last[2]);
-      var days = Math.round((now - lastD) / 864e5);
-      var lastTxt = days === 0 ? 'today' : days === 1 ? 'yesterday' : days < 7
-        ? lastD.toLocaleDateString(undefined, { weekday: 'long' }) : days + ' days ago';
-      return [{ pill: '🏋️ ' + week + ' this week' }, { muted: 'Last workout ' + lastTxt }];
+      var g = gymSummary();
+      if (!g.any) return [{ muted: 'Start your first workout' }];
+      var out = [{ pill: '🏋️ ' + g.thisWeek + ' this week' }];
+      if (g.streak) out.push({ pill: '🔥 ' + g.streak + '-week streak' });
+      return out.concat([{ muted: 'Last workout ' + g.lastTxt }]);
     },
     scent: function () {
       var w = readJSON('scentscout.watch2');
@@ -320,40 +455,82 @@ footer .legal a:hover { color: var(--text); text-decoration: underline; }
       .catch(function () {});
   }
 
-  var root = document.getElementById('apps');
   var isTouch = window.matchMedia && matchMedia('(hover: none)').matches;
-  var updatedEls = {}, statEls = {};
+  var updatedEls = {}, statEls = {}, heroBody = null, heroApp = null;
+  var featured = APPS.filter(function (a) { return a.featured; })[0] || null;
+  var others = APPS.filter(function (a) { return a !== featured; });
+  var order = (featured ? [featured] : []).concat(others); // number keys follow what you see
 
-  APPS.forEach(function (app, i) {
-    var a = el('div', 'app');
+  function cardShell(app, cls, i) {
+    var a = el('div', 'card ' + cls);
     var cover = el('a', 'cover');
     cover.href = app.url;
     cover.setAttribute('aria-label', 'Open ' + app.name);
     a.appendChild(cover);
-    a.style.setProperty('--c1', (app.color && app.color[0]) || '#00f0ff');
-    a.style.setProperty('--c2', (app.color && app.color[1]) || '#ff00ff');
+    a.style.setProperty('--c1', (app.color && app.color[0]) || '#00e5f4');
+    a.style.setProperty('--c2', (app.color && app.color[1]) || '#ff2bd6');
     a.style.animationDelay = (i * 70) + 'ms';
-
-    var top = el('div', 'top');
+    return a;
+  }
+  function icon(app, a) {
     var ico = el('div', 'ico');
     var img = el('img'); img.src = app.icon; img.alt = ''; img.loading = 'lazy';
     img.onerror = function () { ico.textContent = ''; ico.style.background = 'linear-gradient(135deg,' + a.style.getPropertyValue('--c1') + ',' + a.style.getPropertyValue('--c2') + ')'; };
     ico.appendChild(img);
+    return ico;
+  }
+  function trackUpdated(app, node) {
+    if (!app.repo) return;
+    updatedEls[app.repo] = updatedEls[app.repo] || [];
+    updatedEls[app.repo].push({ el: node, label: app.updated || 'Updated' });
+  }
+
+  /* featured card */
+  if (featured) {
+    heroApp = featured;
+    var h = cardShell(featured, 'hero', 0);
+    var top = el('div', 'h-top');
+    top.appendChild(icon(featured, h));
+    var t = el('div');
+    t.appendChild(el('div', 'name', featured.name));
+    t.appendChild(el('div', 'tag', featured.tagline || ''));
+    top.appendChild(t);
+    var right = el('div', 'right');
+    if (featured.id === 'gym') { var chip = el('span', 'chip', ''); chip.id = 'planChip'; chip.hidden = true; right.appendChild(chip); }
+    if (!isTouch) right.appendChild(el('span', 'key', '1'));
+    top.appendChild(right);
+    h.appendChild(top);
+    heroBody = el('div');
+    h.appendChild(heroBody);
+    var foot = el('div', 'h-foot');
+    var last = el('span', 'last', ''); last.id = 'heroLast';
+    foot.appendChild(last);
+    if (featured.id !== 'gym') trackUpdated(featured, last);
+    foot.appendChild(el('span', 'cta', featured.id === 'gym' ? 'Open Neon Gym →' : 'Open ' + featured.name + ' →'));
+    h.appendChild(foot);
+    document.getElementById('featured').appendChild(h);
+  }
+  if (!others.length) document.getElementById('moreHead').hidden = true;
+
+  /* compact tiles */
+  var root = document.getElementById('apps');
+  others.forEach(function (app, i) {
+    var a = cardShell(app, 'app', i + 1);
+    var top = el('div', 'top');
+    top.appendChild(icon(app, a));
     var txt = el('div');
     txt.appendChild(el('div', 'name', app.name));
     txt.appendChild(el('div', 'tag', app.tagline || ''));
-    top.appendChild(ico); top.appendChild(txt);
-    if (i < 9 && !isTouch) top.appendChild(el('span', 'key', String(i + 1)));
+    top.appendChild(txt);
+    var n = order.indexOf(app) + 1;
+    if (n <= 9 && !isTouch) top.appendChild(el('span', 'key', String(n)));
     a.appendChild(top);
-
     var stat = el('div', 'stat');
     statEls[app.id] = stat;
     a.appendChild(stat);
-
     var foot = el('div', 'foot');
     var upd = el('span', 'upd', '');
-    updatedEls[app.repo] = updatedEls[app.repo] || [];
-    updatedEls[app.repo].push({ el: upd, label: app.updated || 'Updated' });
+    trackUpdated(app, upd);
     foot.appendChild(upd);
     if (app.repo) {
       var src = el('a', 'src', 'GitHub');
@@ -361,14 +538,123 @@ footer .legal a:hover { color: var(--text); text-decoration: underline; }
       src.target = '_blank'; src.rel = 'noopener';
       foot.appendChild(src);
     }
-    foot.appendChild(el('span', 'open', 'OPEN →'));
+    foot.appendChild(el('span', 'open', 'Open →'));
     a.appendChild(foot);
-
     root.appendChild(a);
   });
 
+  var FLAME = 'M27 1c3 12 19 20 19 39 0 14-9 25-19 25S8 54 8 40c0-8 4-14 9-18-1 7 2 11 6 12-3-12 0-23 4-33z';
+  var CORE = 'M28 33c2 6 9 9 9 18 0 6-4 11-10 11s-9-5-9-10c0-4 2-7 5-9 0 3 1 5 3 6-1-6 0-11 2-16z';
+
+  function renderHero() {
+    if (!heroBody) return;
+    heroBody.textContent = '';
+    if (heroApp.id !== 'gym') {
+      var lines = [];
+      try { lines = STATS[heroApp.id] ? STATS[heroApp.id]() : []; } catch (e) {}
+      var st = el('div', 'stat'); st.style.marginTop = '16px';
+      lines.forEach(function (l) { st.appendChild(el('span', l.pill ? 'pill' : 'muted', l.pill || l.muted)); });
+      heroBody.appendChild(st);
+      return;
+    }
+    var g; try { g = gymSummary(); } catch (e) { g = null; }
+    if (!g) return;
+
+    var chip = document.getElementById('planChip');
+    if (chip) { chip.hidden = !g.plan; chip.textContent = g.plan ? PLAN_NAME[g.plan] + ' · ' + g.target + '×/wk' : ''; }
+
+    var main = el('div', 'h-main');
+    // ring: workouts this week vs the plan
+    var ring = el('div', 'ring' + (g.thisWeek >= g.target ? ' full' : ''));
+    var svg = svgEl('svg', { viewBox: '0 0 120 120', 'aria-hidden': 'true' });
+    var defs = svgEl('defs'), lg = svgEl('linearGradient', { id: 'rg', x1: '0', y1: '0', x2: '1', y2: '1' });
+    lg.appendChild(svgEl('stop', { offset: '0', 'stop-color': '#00e5f4' }));
+    lg.appendChild(svgEl('stop', { offset: '1', 'stop-color': '#ff2bd6' }));
+    defs.appendChild(lg); svg.appendChild(defs);
+    var C = 2 * Math.PI * 52;
+    svg.appendChild(svgEl('circle', { class: 'track', cx: 60, cy: 60, r: 52, fill: 'none', 'stroke-width': 10 }));
+    var val = svgEl('circle', { class: 'val', cx: 60, cy: 60, r: 52, fill: 'none', stroke: 'url(#rg)', 'stroke-width': 10, 'stroke-linecap': 'round', 'stroke-dasharray': C, 'stroke-dashoffset': C });
+    if (g.thisWeek === 0) val.setAttribute('stroke-opacity', '0');
+    svg.appendChild(val);
+    ring.appendChild(svg);
+    var mid = el('div', 'mid');
+    var num = el('div', 'num'); num.textContent = g.thisWeek;
+    var of = el('small', '', '/' + g.target); num.appendChild(of);
+    mid.appendChild(num);
+    mid.appendChild(el('div', 'lbl', 'THIS WEEK'));
+    ring.appendChild(mid);
+    ring.setAttribute('role', 'img');
+    ring.setAttribute('aria-label', g.thisWeek + ' of ' + g.target + ' workouts done this week');
+    main.appendChild(ring);
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      val.setAttribute('stroke-dashoffset', C * (1 - Math.min(1, g.thisWeek / g.target)));
+    }); });
+
+    // streak
+    var sk = el('div', 'streak');
+    var fl = svgEl('svg', { class: 'flame' + (g.streak ? ' on' : ''), viewBox: '0 0 54 66', 'aria-hidden': 'true' });
+    var fd = svgEl('defs'), fg = svgEl('linearGradient', { id: 'fg', x1: '0', y1: '1', x2: '0', y2: '0' });
+    fg.appendChild(svgEl('stop', { offset: '0', 'stop-color': '#ff2bd6' }));
+    fg.appendChild(svgEl('stop', { offset: '.55', 'stop-color': '#ff7a59' }));
+    fg.appendChild(svgEl('stop', { offset: '1', 'stop-color': '#ffd27a' }));
+    fd.appendChild(fg); fl.appendChild(fd);
+    fl.appendChild(svgEl('path', { d: FLAME, fill: 'url(#fg)' }));
+    fl.appendChild(svgEl('path', { d: CORE, fill: '#fff', 'fill-opacity': g.streak ? .55 : .06 }));
+    sk.appendChild(fl);
+    var st2 = el('div');
+    st2.appendChild(el('div', 's-num' + (g.streak ? ' on' : ''), String(g.streak)));
+    st2.appendChild(el('div', 's-lbl', 'Week streak'));
+    var msg = el('div', 's-msg');
+    var left = Math.max(0, g.target - g.thisWeek);
+    if (!g.any) msg.textContent = 'Do ' + g.target + ' workouts this week to start your streak.';
+    else if (left === 0) msg.innerHTML = '<b>This week is done.</b> ' + (g.streak > 1 ? 'Streak secured.' : 'Streak started.');
+    else if (left > g.daysLeft) msg.innerHTML = '<b>' + left + ' more</b> this week. Get back on it next week.';
+    else msg.innerHTML = '<b>' + left + ' more workout' + (left === 1 ? '' : 's') + '</b> this week ' + (g.streak ? 'to keep your streak.' : 'to start a streak.');
+    st2.appendChild(msg);
+    sk.appendChild(st2);
+    main.appendChild(sk);
+    heroBody.appendChild(main);
+
+    // Mon–Sun
+    var days = el('div', 'days');
+    days.setAttribute('aria-label', 'This week');
+    g.week.forEach(function (d) {
+      var c = el('div', 'day' + (d.done ? ' done' : '') + (d.today ? ' today' : '') + (d.past && !d.done ? ' past' : ''));
+      c.appendChild(el('span', '', d.label));
+      var b = el('i', '', d.done ? '✓' : ''); b.setAttribute('aria-hidden', 'true'); c.appendChild(b);
+      c.setAttribute('aria-label', d.label + (d.done ? ': workout done' : ''));
+      days.appendChild(c);
+    });
+    heroBody.appendChild(days);
+
+    // last 12 weeks + totals
+    var hist = el('div', 'hist');
+    var bars = el('div', 'bars');
+    bars.setAttribute('aria-label', 'Workouts per week, last 12 weeks');
+    g.hist.forEach(function (n, i) {
+      var b = el('i', n >= g.target ? 'met' : n ? 'part' : '');
+      if (i === 11) b.className += ' now';
+      b.style.height = Math.max(8, Math.min(1, n / g.target) * 100) + '%';
+      b.title = n + ' workout' + (n === 1 ? '' : 's');
+      bars.appendChild(b);
+    });
+    var h12 = el('div', 'h12');
+    h12.appendChild(el('p', 'label', 'Last 12 weeks'));
+    h12.appendChild(bars);
+    hist.appendChild(h12);
+    var tots = el('div', 'totals');
+    [[g.total, 'Workouts'], [g.best, 'Best streak'], [g.hist.filter(function (n) { return n >= g.target; }).length + '/12', 'Weeks hit']].forEach(function (p) {
+      var d = el('div', 'tot'); d.appendChild(el('b', '', String(p[0]))); d.appendChild(el('span', '', p[1])); tots.appendChild(d);
+    });
+    hist.appendChild(tots);
+    heroBody.appendChild(hist);
+
+    var last = document.getElementById('heroLast');
+    if (last) last.textContent = g.any ? 'Last workout ' + g.lastTxt : 'Your plan, log and food counter';
+  }
+
   function refreshStats() {
-    APPS.forEach(function (app) {
+    others.forEach(function (app) {
       var stat = statEls[app.id]; if (!stat) return;
       var lines = [];
       try { lines = STATS[app.id] ? STATS[app.id]() : []; } catch (e) { lines = []; }
@@ -378,33 +664,39 @@ footer .legal a:hover { color: var(--text); text-decoration: underline; }
         else if (l.muted) stat.appendChild(el('span', 'muted', l.muted));
       });
     });
+    renderHero();
   }
   refreshStats();
 
   /* Cloud saves: sign in once here and every app on this site is signed in too.
      After sign-in, saves from this device and the account are brought in line,
-     so a new phone shows your progress straight away. */
+     so a new phone shows your progress straight away. Only reads from the account here. */
   var NC = window.NeonCloud;
   var userName = '';
-  var gymCloud = null; // workouts from the account, used until Neon Gym has been opened on this device
   function loadGymCloud() {
     var s = readJSON('menlyn-log-v2');
     if (s && s.sessions && Object.keys(s.sessions).length) return Promise.resolve();
-    return NC.userRef('gym/profile').then(function (ref) { return ref.collection('sessions').get(); })
-      .then(function (q) { var m = {}; q.docs.forEach(function (d) { m[d.id] = d.data(); }); gymCloud = m; })
-      .catch(function () {});
+    return NC.userRef('gym/profile').then(function (ref) {
+      return Promise.all([
+        ref.get().then(function (d) { gymCloudProfile = d.exists ? d.data() : null; }).catch(function () {}),
+        ref.collection('sessions').get().then(function (q) { var m = {}; q.docs.forEach(function (d) { m[d.id] = d.data(); }); gymCloud = m; })
+      ]);
+    }).catch(function () {});
   }
   if (NC && NC.enabled) {
-    NC.badge(document.getElementById('acct'));
+    NC.badge(document.getElementById('acct'), { className: 'nc-compact' });
     NC.onUser(function (u) {
       userName = u ? (u.name || u.email || '').split(/[\s@]/)[0] : '';
       document.getElementById('cloudNote').hidden = !!u;
       tick();
-      if (!u) gymCloud = null;
+      if (!u) { gymCloud = null; gymCloudProfile = null; }
       if (u) NC.syncAll().then(loadGymCloud, loadGymCloud).then(refreshStats);
     });
   }
   window.addEventListener('storage', refreshStats);
+  // coming back to the hub (e.g. from Neon Gym on a phone) shows the latest numbers
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) refreshStats(); });
+  window.addEventListener('pageshow', function (e) { if (e.persisted) refreshStats(); });
 
   loadUpdated(function (data) {
     Object.keys(updatedEls).forEach(function (repo) {
@@ -413,11 +705,12 @@ footer .legal a:hover { color: var(--text); text-decoration: underline; }
     });
   });
 
-  // number keys 1–9 open an app
+  // number keys 1–9 open an app, in the order shown
   document.addEventListener('keydown', function (e) {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var t = e.target; if (t && /INPUT|TEXTAREA|SELECT/.test(t.tagName)) return;
     var n = parseInt(e.key, 10);
-    if (n >= 1 && n <= APPS.length) location.href = APPS[n - 1].url;
+    if (n >= 1 && n <= order.length) location.href = order[n - 1].url;
   });
 
   // greeting + clock

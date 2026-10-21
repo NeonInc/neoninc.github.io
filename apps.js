@@ -14,8 +14,20 @@
     icon     image for the tile (any path the browser can load)
     color    two accent colours for the tile glow
     updated  wording for the "updated …" line (optional)
+    featured true = shown as the big card at the top of the hub (one app only).
+             Apps appear in the order listed here.
 */
 window.NEON_APPS = [
+  {
+    id: 'gym',
+    name: 'Neon Gym',
+    tagline: 'Gym plan, training log and food counter',
+    url: 'neon-gym/',
+    repo: 'neon-gym',
+    icon: 'neon-gym/icon.svg',
+    color: ['#00e5f4', '#ff2bd6'],
+    featured: true,
+  },
   {
     id: 'scent',
     name: 'Scent Scout',
@@ -34,14 +46,5 @@ window.NEON_APPS = [
     repo: 'neoninc.github.io',
     icon: 'arcade/assets/icon.svg',
     color: ['#00f0ff', '#ff00ff'],
-  },
-  {
-    id: 'gym',
-    name: 'Neon Gym',
-    tagline: 'Gym plan, training log and food counter',
-    url: 'neon-gym/',
-    repo: 'neon-gym',
-    icon: 'neon-gym/icon.svg',
-    color: ['#00e5f4', '#ff2bd6'],
   },
 ];
