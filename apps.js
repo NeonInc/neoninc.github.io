@@ -21,7 +21,7 @@ window.NEON_APPS = [
   {
     id: 'gym',
     name: 'Neon Gym',
-    tagline: 'Gym plan, training log and food counter',
+    tagline: 'Gym plan, training log, food and water tracker',
     url: 'neon-gym/',
     repo: 'neon-gym',
     icon: 'neon-gym/icon.svg',

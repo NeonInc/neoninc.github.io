@@ -15,13 +15,16 @@ This repo serves https://neoninc.github.io/ and holds TWO things. Keep them apar
 - Keep the redirect folders at the root (`games/`, `snake/`, `flappy/`). They forward old
   arcade links into `arcade/`. If you add a new arcade game, it does NOT need a redirect.
 - Adding a new app to the hub = add one entry to `apps.js`. Don't hard-code tiles in `index.html`.
-  The app with `featured: true` in `apps.js` (Neon Gym) is the big card at the top; the rest are smaller tiles below.
+  The app with `featured: true` in `apps.js` (Neon Gym) is the big card at the top; the rest are rows below.
+  The hub copies Neon Gym's look (Bebas Neue / Barlow / JetBrains Mono, near-black, fold-outs). Keep it minimal:
+  explanations go in the fold-outs ("What are these apps?" is built from each app's `tagline`).
 - The hub reads these save keys read-only to show tile status. If you change one in an app,
   update the matching function in `STATS` in `index.html`:
   - Neon Arcade: `localStorage['neonArcade_v3']` (`level`, `shards`, `streak`)
   - Neon Gym: `localStorage['menlyn-log-v2']` (`sessions[*].date`, `.done`, `.sets`, `profile.plan`).
-    Read by `gymSummary()` in `index.html` (week ring, week streak, 12-week bars). `PLAN_TARGET` there
-    must match `PLANS[*].perWeek` in Neon Gym; update it if a plan is added or its days per week change.
+    Also `profile.customPlans[*].{id,n,perWeek}`. Read by `gymSummary()` in `index.html` (week ring,
+    week streak, Mon–Sun row). `PLANS` there must match Neon Gym's built-in `PLANS[*].perWeek`;
+    add a line if Neon Gym gets a new built-in plan.
   - Scent Scout: `localStorage['scentscout.watch2']` (array of `{ gk, ... }`)
 - The other apps live in their own repos (`NeonInc/neon-gym`, `NeonInc/scent-scout`). Edit them there.
 - `neon-arcade` and `neon-snake` repos are old versions. The live arcade is here in `arcade/`.
@@ -49,7 +52,7 @@ This repo serves https://neoninc.github.io/ and holds TWO things. Keep them apar
 
 ## Google sign-in branding
 
-- `privacy.html`, `terms.html` (styled by `legal.css`) and the hub's About text and footer links are what
+- `privacy.html`, `terms.html` (styled by `legal.css`) and the hub's app descriptions and footer links are what
   Google checks for brand verification of the sign-in screen. Keep them at these paths and keep the
   footer links on the hub. Contact address: neoninc.support@gmail.com.
 - If the apps start collecting new kinds of personal data, update `privacy.html` (and its date).
